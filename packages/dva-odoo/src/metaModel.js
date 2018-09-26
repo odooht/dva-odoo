@@ -5,6 +5,8 @@
   TBD: check and rewrite reducer method.
 */
 
+import modelExtend from 'dva-model-extend';
+
 function _odooCallParams(params0) {
   const {
     model,
@@ -63,7 +65,7 @@ export default options => {
     fields: default_fields = ['name'],
   } = options;
 
-  return {
+  const baseModel = {
     namespace: namespace,
 
     state: {
@@ -96,7 +98,39 @@ export default options => {
           },
         });
       },
+    },
 
+    reducers: {
+      view(state, { payload }) {
+        const { id: pid } = payload;
+        const { id: oid, ids: oids } = state;
+
+        const id = pid && pid in oids ? pid : oid;
+        return { ...state, id };
+      },
+
+      insert(state, { payload }) {
+        const { ids } = state;
+        const { id } = payload;
+        return { ...state, ids: [id, ...ids], id };
+      },
+
+      remove(state, { payload }) {
+        const { ids: oids, id: oid } = state;
+        const { id: pid } = payload;
+        const ids = oids.filter(i => i != pid);
+        const id = oid != pid ? oid : 0;
+        return { ...state, ids, id };
+      },
+
+      save(state, { payload }) {
+        return { ...state, ...payload };
+      },
+    },
+  };
+
+  const extendModel = {
+    effects: {
       *read({ payload }, { call, put, select }) {
         const { id, fields = default_fields, mock = 'read' } = payload;
         yield put(
@@ -250,33 +284,10 @@ export default options => {
         }
       },
     },
-
-    reducers: {
-      view(state, { payload }) {
-        const { id: pid } = payload;
-        const { id: oid, ids: oids } = state;
-
-        const id = pid && pid in oids ? pid : oid;
-        return { ...state, id };
-      },
-
-      insert(state, { payload }) {
-        const { ids } = state;
-        const { id } = payload;
-        return { ...state, ids: [id, ...ids], id };
-      },
-
-      remove(state, { payload }) {
-        const { ids: oids, id: oid } = state;
-        const { id: pid } = payload;
-        const ids = oids.filter(i => i != pid);
-        const id = oid != pid ? oid : 0;
-        return { ...state, ids, id };
-      },
-
-      save(state, { payload }) {
-        return { ...state, ...payload };
-      },
-    },
   };
+
+  return modelExtend(baseModel, {
+    ...extendModel,
+    namespace: baseModel.namespace,
+  });
 };

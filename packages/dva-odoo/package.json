@@ -1,0 +1,30 @@
+{
+  "name": "dva-odoo",
+  "version": "1.0.1-bata.6",
+  "description": "A creator of dva model for odoo.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/odooht/dva-odoo"
+  },
+  "homepage": "https://github.com/odooht/dva-odoo",
+  "keywords": [
+    "dva",
+    "odoo"
+  ],
+  "author": "odooHT <odooht@163.com>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "devDependencies": {
+    "dva": "^2.5.0-beta.2"
+  },
+  "peerDependencies": {
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.0.0",
+    "dva-model-extend": "*"
+  }
+}

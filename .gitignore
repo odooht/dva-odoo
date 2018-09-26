@@ -61,4 +61,7 @@ typings/
 .next
 
 # Mac files
-*.DS_Store
+.DS_Store
+
+# yarn files
+yarn.lock

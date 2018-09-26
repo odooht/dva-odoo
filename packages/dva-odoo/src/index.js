@@ -23,15 +23,33 @@ const getBaseOptions = options => {
   return options;
 };
 
+const create_odooData = options => {
+  const { service } = options;
+  return odooDataCreate({ service });
+};
+
+const create_login = options => {
+  const { service, extend = {} } = options;
+
+  //  const dvamodel = loginCreate({ service });
+  const dvamodel = loginCreate(options);
+
+  console.log(dvamodel);
+
+  const { namespace } = dvamodel;
+
+  return modelExtend(dvamodel, { ...extend, namespace });
+};
+
 export default options => {
-  const { inherit = 'base', namespace, service } = options;
+  const { inherit = 'base' } = options;
 
   if (inherit == 'odooData') {
-    return odooDataCreate({ service });
+    return create_odooData(options);
   }
 
   if (inherit == 'login') {
-    return loginCreate({ service });
+    return create_login(options);
   }
 
   const new_options = getBaseOptions(options);

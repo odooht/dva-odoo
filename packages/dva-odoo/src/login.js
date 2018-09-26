@@ -18,10 +18,10 @@ const jsonrpc = params => {
 };
 
 export default options => {
-  const { service } = options;
+  const { namespace = 'login', service } = options;
 
   return {
-    namespace: 'login',
+    namespace: namespace,
 
     state: {
       sid: '',

@@ -3,34 +3,10 @@ import dvaOdoo from '../src/index';
 import dva from 'dva';
 
 describe('dva-odoo', () => {
-  it('test odooData model ok', done => {
-    test_odoodata(done);
+  it(' ok', done => {
+    done();
   });
 });
-
-const test_odoodata = done => {
-  const app = dva();
-  app.model(
-    dvaOdoo({
-      inherit: 'odooData',
-      service: () => {
-        {
-          id: 1;
-        }
-      },
-    })
-  );
-
-  app.router(() => 1);
-  app.start();
-
-  const oldState = app._store.getState().odooData;
-  expect(oldState).toEqual({});
-
-  //app._store.dispatch({ type: 'testbase/search' });
-
-  done();
-};
 
 const service = (token, params) => {
   expect(token).toEqual('sid123');

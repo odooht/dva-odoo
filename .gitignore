@@ -60,8 +60,9 @@ typings/
 # next.js build output
 .next
 
-# Mac files
+# misc
 .DS_Store
 
-# yarn files
-yarn.lock
+# dependencies
+/yarn-error.log
+/yarn.lock

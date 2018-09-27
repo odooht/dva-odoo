@@ -59,3 +59,15 @@ typings/
 
 # next.js build output
 .next
+
+# misc
+.DS_Store
+
+# dependencies
+/yarn-error.log
+/yarn.lock
+yarn.lock
+
+# 
+packages/dva-odoo/lib/
+packages/dva-odoo-mock/lib/

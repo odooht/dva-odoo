@@ -1,24 +1,3 @@
-import modelExtend from 'dva-model-extend';
-
-const getCallAction = options => {
-  const { method, args, kwargs = {}, mock, callback, params } = options;
-  return {
-    type: 'call',
-    payload: {
-      params: {
-        method,
-        args,
-        kwargs,
-        mock,
-      },
-      callback: {
-        type: callback ? callback : method + '_callback',
-        params,
-      },
-    },
-  };
-};
-
 export default options => {
   console.log('res.partner:', options);
   const model = 'res.partner';
@@ -37,27 +16,18 @@ export default options => {
 
       effects: {
         *findOrCreate({ payload }, { call, put, select }) {
-          const {
-            fields = default_fields,
-            email,
-            mock = 'findOrCreate',
-          } = payload;
-          yield put(
-            getCallAction({
-              method: 'find_or_create',
-              args: [email],
-              mock,
-              callback: 'findOrCreate_callback',
-              params: payload,
-            })
-          );
+          const fn = ( payload ) => {
+            const { fields = default_fields, email, mock = 'findOrCreate' } = payload;
+            const method = 'find_or_create';
+            const args = [email]
+            const callback = 'findOrCreate_callback'
+            return {method, args, mock, callback ,params: payload }
+          }
+          yield put({type: 'call',  payload: fn( payload)})
         },
 
         *findOrCreate_callback({ payload }, { call, put, select }) {
-          const {
-            params: { fields },
-            response: { result },
-          } = payload;
+          const { params: { fields }, data: { result } } = payload;
           if (result) {
             yield put({ type: 'read', payload: { id: result, fields } });
             yield put({ type: 'insert', payload: { id: result } });

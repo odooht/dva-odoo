@@ -34,33 +34,17 @@ function _odooCallParams(params0) {
 const jsonrpc = params => {
   return {
     method: 'POST',
-    body: {
-      jsonrpc: 2.0,
-      id: 1,
-      method: 'call',
-      params: params,
-    },
+    body: { jsonrpc: 2.0, id: 1, method: 'call', params: params }
   };
 };
 
-const getCallAction = options => {
+const getCallActionPayload = options => {
   const { method, args, kwargs = {}, mock, callback, params } = options;
   return {
-    type: 'call',
-    payload: {
-      params: {
-        method,
-        args,
-        kwargs,
-        mock,
-      },
-      callback: {
-        type: callback ? callback : method + '_callback',
-        params,
-      },
-    },
-  };
-};
+      params: { method, args, kwargs, mock},
+      callback: { params, type: callback ? callback : method + '_callback' }
+  }
+}
 
 
 export default options => {
@@ -80,8 +64,9 @@ export default options => {
     },
 
     effects: {
-      *call({ payload }, { call, put, select }) {
-        const { callback } = payload;
+      *call({ payload }, { call, put, select }){
+        const payload2 = getCallActionPayload(payload)
+        const { callback } = payload2;
         let data = {};
 
         const token = yield select(state => state.login.sid);
@@ -89,7 +74,7 @@ export default options => {
           data = { result: 0, error: { code: 1, msg: 'no login' } };
         }
         else {
-          const { params: params0 } = payload;
+          const { params: params0 } = payload2;
           const params1 = { ...params0, model, namespace };
           const params = jsonrpc(_odooCallParams(params1));
           const response0 = yield service(token, params);
@@ -144,9 +129,9 @@ export default options => {
           const { id, fields = default_fields, mock = 'read' } = payload;
           const args = [id, fields];
           const method = 'read'
-          return getCallAction( { method, args, mock, params: payload } )
+          return  { method, args, mock, params: payload } 
         }
-        yield put( fn( payload ))
+        yield put( {type: 'call',  payload: fn( payload)})
       },
 
       *read_callback({ payload }, { call, put, select }) {
@@ -169,9 +154,9 @@ export default options => {
           const { id, vals, mock = 'write' } = payload;
           const args = [id, vals];
           const method = 'write'
-          return getCallAction( { method, args, mock, params: payload } )
+          return  { method, args, mock, params: payload } 
         }
-        yield put( fn( payload ))
+        yield put( {type: 'call',  payload: fn( payload)})
       },
 
       *write_callback({ payload }, { call, put, select }) {
@@ -190,9 +175,9 @@ export default options => {
           const args = [domain]
           const method = 'search'
           const callback = '_search_callback'
-          return getCallAction( { method, args, mock, callback, params: payload } )
+          return { method, args, mock, callback, params: payload }
         }
-        yield put( fn( payload ))
+        yield put( {type: 'call',  payload: fn( payload)})
       },
 
       *_search_callback({ payload }, { call, put, select }) {
@@ -218,9 +203,9 @@ export default options => {
           const args = [name];
           const method = 'name_create'
           const callback = 'nameCreate_callback'
-          return getCallAction( { method, args, mock, callback, params: payload } )
+          return { method, args, mock, callback, params: payload }
         }
-        yield put( fn( payload ))
+        yield put( {type: 'call',  payload: fn( payload)})
       },
 
       *nameCreate_callback({ payload }, { call, put, select }) {
@@ -236,9 +221,9 @@ export default options => {
           const { fields = default_fields, vals, mock = 'create' } = payload;
           const args = [vals];
           const method = 'create'
-          return getCallAction( { method, args, mock, params: payload } )
+          return { method, args, mock, params: payload }
         }
-        yield put( fn( payload ))
+        yield put( {type: 'call',  payload: fn( payload)})
       },
 
       *create_callback({ payload }, { call, put, select }) {
@@ -254,9 +239,9 @@ export default options => {
           const { id, mock = 'unlink' } = payload;
           const args = [id];
           const method = 'unlink'
-          return getCallAction( { method, args, mock, params: payload } )
+          return { method, args, mock, params: payload }
         }
-        yield put( fn( payload ))
+        yield put( {type: 'call',  payload: fn( payload)})
       },
 
       *unlink_callback({ payload }, { call, put, select }) {

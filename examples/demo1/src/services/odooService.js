@@ -27,14 +27,16 @@ async function mockRequest( url, params ){
       }})
     })
 
-    return response.then( (data) => { return data }).catch( (data) => { return data } )
+    return response
+      .then( (data) => { return data })
+      .catch( (data) => { return data } )
 }
 
 async function login( params0 ){
   const { body } = params0;
   const { params: params1 } = body;
 
-  const {database:{name:db}} = odoorc
+  const { database: db } = odoorc
 
   const params = {...params0, body:{ ...body, params: { ...params1,db}}}
 

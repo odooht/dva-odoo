@@ -23,8 +23,8 @@
 
     "cross-env": "^5.1.1",
     "roadhog-api-doc": "^1.1.2",
-    "dva-odoo": "*",
-    "dva-odoo-mock": "*"
+    "dva-odoo": "^0.1.1",
+    "dva-odoo-mock": "^0.1.0"
   },
   "lint-staged": {
     "*.{js,jsx}": ["eslint --fix", "git add"]

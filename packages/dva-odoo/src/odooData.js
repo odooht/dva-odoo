@@ -6,7 +6,6 @@ function dot2line(model) {
 }
 
 export default options => {
-  //const { service } = options;
   return {
     namespace: 'odooData',
 
@@ -32,17 +31,6 @@ export default options => {
       },
 
       save(state, { payload }) {
-
-//        console.log( payload )
-//          console.log('model=',model)
-//          console.log('old_records=',old_records)
-//            console.log('id=',id)
-//            console.log('rec=',rec)
-//            console.log('old_rec=',old_rec)
-//            console.log('old_rec=',old_rec)
-        
-//        console.log( new_state.res_partner )
-        
 
         const new_state = {};
         for (var model in payload) {

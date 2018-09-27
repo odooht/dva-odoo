@@ -56,7 +56,7 @@ const test_read = done => {
                            {id:3,name:'n3'}
                           ]}
         case 'testbase/search':
-          return {result: [1,3]}
+          return {result: [1,2]}
         default:
           return {result: 1 }
       }
@@ -93,7 +93,8 @@ const test_read = done => {
   app._store.dispatch({
     type: 'login/login',
     payload: { login: 'admin', password: '123', type: 'account' }
-  }).then(res => {
+  })
+  .then(res => {
     const state2 = app._store.getState();
     console.log(state2)
     expect(state2.login).toEqual({ sid: 'sid1', uid: 1, status: 'ok' });
@@ -104,15 +105,19 @@ const test_read = done => {
       type: 'testbase/search',
       payload: {domain:[]}
       
-    }).then( res => {
+    })
+    .then( res => {
       const state3 = app._store.getState();
       console.log(state3)
       expect(state3.odooData).toEqual({
         'res_partner': {
           1:{ id:1, name:'n1' },
           2:{ id:2, name:'n2' },
+          3:{ id:3, name:'n3' },
         }
       });
+      
+      expect(state3.testbase).toEqual({ids:[1,2], id:0})
 
       done();
     

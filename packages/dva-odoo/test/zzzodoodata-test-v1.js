@@ -48,7 +48,7 @@ const test_read = done => {
 
   expect(state0.odooData).toEqual({});
 
-  app._store
+    app._store
     .dispatch({
       type: 'odooData/read',
       payload: {

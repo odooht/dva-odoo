@@ -22,6 +22,11 @@ var _dvaModelExtend = _interopRequireDefault(require("dva-model-extend"));
     read, search, create, write, unlink.
 
   TBD: check and rewrite reducer method.
+  
+  many2one
+  one2many
+  many2many
+  
 */
 function _odooCallParams(params0) {
   var model = params0.model,
@@ -104,7 +109,7 @@ var _default = function _default(options) {
       call:
       /*#__PURE__*/
       _regenerator.default.mark(function call(_ref, _ref2) {
-        var payload, _call, put, select, callback, response, token, params0, params1, params, response0, result, error;
+        var payload, _call, put, select, callback, data, token, params0, params1, params, response0, result, error;
 
         return _regenerator.default.wrap(function call$(_context) {
           while (1) {
@@ -113,7 +118,7 @@ var _default = function _default(options) {
                 payload = _ref.payload;
                 _call = _ref2.call, put = _ref2.put, select = _ref2.select;
                 callback = payload.callback;
-                response = {};
+                data = {};
                 _context.next = 6;
                 return select(function (state) {
                   return state.login.sid;
@@ -127,7 +132,7 @@ var _default = function _default(options) {
                   break;
                 }
 
-                response = {
+                data = {
                   result: 0,
                   error: {
                     code: 1,
@@ -150,7 +155,7 @@ var _default = function _default(options) {
               case 16:
                 response0 = _context.sent;
                 result = response0.result, error = response0.error;
-                response = {
+                data = {
                   result: result
                 };
 
@@ -159,8 +164,9 @@ var _default = function _default(options) {
                 return put({
                   type: callback.type,
                   payload: {
+                    model: model,
                     params: callback.params,
-                    response: response
+                    data: data
                   }
                 });
 
@@ -217,22 +223,32 @@ var _default = function _default(options) {
       read:
       /*#__PURE__*/
       _regenerator.default.mark(function read(_ref7, _ref8) {
-        var payload, call, put, select, id, _payload$fields, fields, _payload$mock, mock;
-
+        var payload, call, put, select, fn;
         return _regenerator.default.wrap(function read$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 payload = _ref7.payload;
                 call = _ref8.call, put = _ref8.put, select = _ref8.select;
-                id = payload.id, _payload$fields = payload.fields, fields = _payload$fields === void 0 ? default_fields : _payload$fields, _payload$mock = payload.mock, mock = _payload$mock === void 0 ? 'read' : _payload$mock;
+
+                fn = function fn(payload) {
+                  var id = payload.id,
+                      _payload$fields = payload.fields,
+                      fields = _payload$fields === void 0 ? default_fields : _payload$fields,
+                      _payload$mock = payload.mock,
+                      mock = _payload$mock === void 0 ? 'read' : _payload$mock;
+                  var args = [id, fields];
+                  var method = 'read';
+                  return getCallAction({
+                    method: method,
+                    args: args,
+                    mock: mock,
+                    params: payload
+                  });
+                };
+
                 _context2.next = 5;
-                return put(getCallAction({
-                  method: 'read',
-                  args: [id, fields],
-                  mock: mock,
-                  params: payload
-                }));
+                return put(fn(payload));
 
               case 5:
               case "end":
@@ -244,95 +260,90 @@ var _default = function _default(options) {
       read_callback:
       /*#__PURE__*/
       _regenerator.default.mark(function read_callback(_ref9, _ref10) {
-        var payload, call, put, select, result, res1, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, r;
-
+        var payload, call, put, select, model2, params, data, response, result;
         return _regenerator.default.wrap(function read_callback$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 payload = _ref9.payload;
                 call = _ref10.call, put = _ref10.put, select = _ref10.select;
-                result = payload.response.result;
-                res1 = {};
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
-                _context3.prev = 7;
+                model2 = payload.model, params = payload.params, data = payload.data;
 
-                for (_iterator = result[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                  r = _step.value;
-                  res1[r.id] = r;
-                }
+                response = function response(data) {
+                  var result = data.result;
+                  var res1 = {};
+                  var _iteratorNormalCompletion = true;
+                  var _didIteratorError = false;
+                  var _iteratorError = undefined;
 
-                _context3.next = 15;
-                break;
+                  try {
+                    for (var _iterator = result[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                      var r = _step.value;
+                      res1[r.id] = r;
+                    }
+                  } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                  } finally {
+                    try {
+                      if (!_iteratorNormalCompletion && _iterator.return != null) {
+                        _iterator.return();
+                      }
+                    } finally {
+                      if (_didIteratorError) {
+                        throw _iteratorError;
+                      }
+                    }
+                  }
 
-              case 11:
-                _context3.prev = 11;
-                _context3.t0 = _context3["catch"](7);
-                _didIteratorError = true;
-                _iteratorError = _context3.t0;
+                  return res1;
+                };
 
-              case 15:
-                _context3.prev = 15;
-                _context3.prev = 16;
-
-                if (!_iteratorNormalCompletion && _iterator.return != null) {
-                  _iterator.return();
-                }
-
-              case 18:
-                _context3.prev = 18;
-
-                if (!_didIteratorError) {
-                  _context3.next = 21;
-                  break;
-                }
-
-                throw _iteratorError;
-
-              case 21:
-                return _context3.finish(18);
-
-              case 22:
-                return _context3.finish(15);
-
-              case 23:
-                _context3.next = 25;
+                result = response(data);
+                _context3.next = 7;
                 return put({
                   type: 'odooData/update',
                   payload: {
-                    model: model,
-                    data: res1
+                    model: model2,
+                    data: result
                   }
                 });
 
-              case 25:
+              case 7:
               case "end":
                 return _context3.stop();
             }
           }
-        }, read_callback, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+        }, read_callback, this);
       }),
       write:
       /*#__PURE__*/
       _regenerator.default.mark(function write(_ref11, _ref12) {
-        var payload, call, put, select, id, vals, _payload$mock2, mock;
-
+        var payload, call, put, select, fn;
         return _regenerator.default.wrap(function write$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 payload = _ref11.payload;
                 call = _ref12.call, put = _ref12.put, select = _ref12.select;
-                id = payload.id, vals = payload.vals, _payload$mock2 = payload.mock, mock = _payload$mock2 === void 0 ? 'write' : _payload$mock2;
+
+                fn = function fn(payload) {
+                  var id = payload.id,
+                      vals = payload.vals,
+                      _payload$mock2 = payload.mock,
+                      mock = _payload$mock2 === void 0 ? 'write' : _payload$mock2;
+                  var args = [id, vals];
+                  var method = 'write';
+                  return getCallAction({
+                    method: method,
+                    args: args,
+                    mock: mock,
+                    params: payload
+                  });
+                };
+
                 _context4.next = 5;
-                return put(getCallAction({
-                  method: 'write',
-                  args: [id, vals],
-                  mock: mock,
-                  params: payload
-                }));
+                return put(fn(payload));
 
               case 5:
               case "end":
@@ -344,7 +355,7 @@ var _default = function _default(options) {
       write_callback:
       /*#__PURE__*/
       _regenerator.default.mark(function write_callback(_ref13, _ref14) {
-        var payload, call, put, select, _payload$params, id, vals, result;
+        var payload, call, put, select, model2, _payload$params, id, vals, result;
 
         return _regenerator.default.wrap(function write_callback$(_context5) {
           while (1) {
@@ -352,7 +363,7 @@ var _default = function _default(options) {
               case 0:
                 payload = _ref13.payload;
                 call = _ref14.call, put = _ref14.put, select = _ref14.select;
-                _payload$params = payload.params, id = _payload$params.id, vals = _payload$params.vals, result = payload.response.result;
+                model2 = payload.model, _payload$params = payload.params, id = _payload$params.id, vals = _payload$params.vals, result = payload.data.result;
 
                 if (!result) {
                   _context5.next = 6;
@@ -363,7 +374,7 @@ var _default = function _default(options) {
                 return put({
                   type: 'odooData/update',
                   payload: {
-                    model: model,
+                    model: model2,
                     data: (0, _defineProperty2.default)({}, id, vals)
                   }
                 });
@@ -378,23 +389,32 @@ var _default = function _default(options) {
       _search:
       /*#__PURE__*/
       _regenerator.default.mark(function _search(_ref15, _ref16) {
-        var payload, call, put, select, domain, _payload$mock3, mock;
-
+        var payload, call, put, select, fn;
         return _regenerator.default.wrap(function _search$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 payload = _ref15.payload;
                 call = _ref16.call, put = _ref16.put, select = _ref16.select;
-                domain = payload.domain, _payload$mock3 = payload.mock, mock = _payload$mock3 === void 0 ? 'search' : _payload$mock3;
+
+                fn = function fn(payload) {
+                  var domain = payload.domain,
+                      _payload$mock3 = payload.mock,
+                      mock = _payload$mock3 === void 0 ? 'search' : _payload$mock3;
+                  var args = [domain];
+                  var method = 'search';
+                  var callback = '_search_callback';
+                  return getCallAction({
+                    method: method,
+                    args: args,
+                    mock: mock,
+                    callback: callback,
+                    params: payload
+                  });
+                };
+
                 _context6.next = 5;
-                return put(getCallAction({
-                  method: 'search',
-                  args: [domain],
-                  mock: mock,
-                  callback: '_search_callback',
-                  params: payload
-                }));
+                return put(fn(payload));
 
               case 5:
               case "end":
@@ -413,7 +433,7 @@ var _default = function _default(options) {
               case 0:
                 payload = _ref17.payload;
                 call = _ref18.call, put = _ref18.put, select = _ref18.select;
-                fields = payload.params.fields, result = payload.response.result;
+                fields = payload.params.fields, result = payload.data.result;
 
                 if (!result) {
                   _context7.next = 8;
@@ -472,23 +492,34 @@ var _default = function _default(options) {
       nameCreate:
       /*#__PURE__*/
       _regenerator.default.mark(function nameCreate(_ref21, _ref22) {
-        var payload, call, put, select, _payload$fields2, fields, name, _payload$mock4, mock;
-
+        var payload, call, put, select, fn;
         return _regenerator.default.wrap(function nameCreate$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
                 payload = _ref21.payload;
                 call = _ref22.call, put = _ref22.put, select = _ref22.select;
-                _payload$fields2 = payload.fields, fields = _payload$fields2 === void 0 ? default_fields : _payload$fields2, name = payload.name, _payload$mock4 = payload.mock, mock = _payload$mock4 === void 0 ? 'nameCreate' : _payload$mock4;
+
+                fn = function fn(payload) {
+                  var _payload$fields2 = payload.fields,
+                      fields = _payload$fields2 === void 0 ? default_fields : _payload$fields2,
+                      name = payload.name,
+                      _payload$mock4 = payload.mock,
+                      mock = _payload$mock4 === void 0 ? 'nameCreate' : _payload$mock4;
+                  var args = [name];
+                  var method = 'name_create';
+                  var callback = 'nameCreate_callback';
+                  return getCallAction({
+                    method: method,
+                    args: args,
+                    mock: mock,
+                    callback: callback,
+                    params: payload
+                  });
+                };
+
                 _context9.next = 5;
-                return put(getCallAction({
-                  method: 'name_create',
-                  args: [name],
-                  mock: mock,
-                  callback: 'nameCreate_callback',
-                  params: payload
-                }));
+                return put(fn(payload));
 
               case 5:
               case "end":
@@ -507,7 +538,7 @@ var _default = function _default(options) {
               case 0:
                 payload = _ref23.payload;
                 call = _ref24.call, put = _ref24.put, select = _ref24.select;
-                fields = payload.params.fields, result = payload.response.result;
+                fields = payload.params.fields, result = payload.data.result;
 
                 if (!result) {
                   _context10.next = 8;
@@ -542,22 +573,32 @@ var _default = function _default(options) {
       create:
       /*#__PURE__*/
       _regenerator.default.mark(function create(_ref25, _ref26) {
-        var payload, call, put, select, _payload$fields3, fields, vals, _payload$mock5, mock;
-
+        var payload, call, put, select, fn;
         return _regenerator.default.wrap(function create$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
                 payload = _ref25.payload;
                 call = _ref26.call, put = _ref26.put, select = _ref26.select;
-                _payload$fields3 = payload.fields, fields = _payload$fields3 === void 0 ? default_fields : _payload$fields3, vals = payload.vals, _payload$mock5 = payload.mock, mock = _payload$mock5 === void 0 ? 'create' : _payload$mock5;
+
+                fn = function fn(payload) {
+                  var _payload$fields3 = payload.fields,
+                      fields = _payload$fields3 === void 0 ? default_fields : _payload$fields3,
+                      vals = payload.vals,
+                      _payload$mock5 = payload.mock,
+                      mock = _payload$mock5 === void 0 ? 'create' : _payload$mock5;
+                  var args = [vals];
+                  var method = 'create';
+                  return getCallAction({
+                    method: method,
+                    args: args,
+                    mock: mock,
+                    params: payload
+                  });
+                };
+
                 _context11.next = 5;
-                return put(getCallAction({
-                  method: 'create',
-                  args: [vals],
-                  mock: mock,
-                  params: payload
-                }));
+                return put(fn(payload));
 
               case 5:
               case "end":
@@ -576,7 +617,7 @@ var _default = function _default(options) {
               case 0:
                 payload = _ref27.payload;
                 call = _ref28.call, put = _ref28.put, select = _ref28.select;
-                fields = payload.params.fields, result = payload.response.result;
+                fields = payload.params.fields, result = payload.data.result;
 
                 if (!result) {
                   _context12.next = 8;
@@ -611,22 +652,30 @@ var _default = function _default(options) {
       unlink:
       /*#__PURE__*/
       _regenerator.default.mark(function unlink(_ref29, _ref30) {
-        var payload, call, put, select, id, _payload$mock6, mock;
-
+        var payload, call, put, select, fn;
         return _regenerator.default.wrap(function unlink$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
                 payload = _ref29.payload;
                 call = _ref30.call, put = _ref30.put, select = _ref30.select;
-                id = payload.id, _payload$mock6 = payload.mock, mock = _payload$mock6 === void 0 ? 'unlink' : _payload$mock6;
+
+                fn = function fn(payload) {
+                  var id = payload.id,
+                      _payload$mock6 = payload.mock,
+                      mock = _payload$mock6 === void 0 ? 'unlink' : _payload$mock6;
+                  var args = [id];
+                  var method = 'unlink';
+                  return getCallAction({
+                    method: method,
+                    args: args,
+                    mock: mock,
+                    params: payload
+                  });
+                };
+
                 _context13.next = 5;
-                return put(getCallAction({
-                  method: 'unlink',
-                  args: [id],
-                  mock: mock,
-                  params: payload
-                }));
+                return put(fn(payload));
 
               case 5:
               case "end":
@@ -638,14 +687,14 @@ var _default = function _default(options) {
       unlink_callback:
       /*#__PURE__*/
       _regenerator.default.mark(function unlink_callback(_ref31, _ref32) {
-        var payload, call, put, select, id, result;
+        var payload, call, put, select, model2, id, result;
         return _regenerator.default.wrap(function unlink_callback$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
                 payload = _ref31.payload;
                 call = _ref32.call, put = _ref32.put, select = _ref32.select;
-                id = payload.params.id, result = payload.response.result;
+                model2 = payload.model, id = payload.params.id, result = payload.data.result;
 
                 if (!result) {
                   _context14.next = 8;
@@ -656,7 +705,7 @@ var _default = function _default(options) {
                 return put({
                   type: 'odooData/remove',
                   payload: {
-                    model: model,
+                    model: model2,
                     id: id
                   }
                 });

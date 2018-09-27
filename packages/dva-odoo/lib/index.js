@@ -49,8 +49,8 @@ var create_login = function create_login(options) {
       _options$extend = options.extend,
       extend = _options$extend === void 0 ? {} : _options$extend; //  const dvamodel = loginCreate({ service });
 
-  var dvamodel = (0, _login.default)(options);
-  console.log(dvamodel);
+  var dvamodel = (0, _login.default)(options); //  console.log(dvamodel);
+
   var namespace = dvamodel.namespace;
   return (0, _dvaModelExtend.default)(dvamodel, (0, _objectSpread2.default)({}, extend, {
     namespace: namespace

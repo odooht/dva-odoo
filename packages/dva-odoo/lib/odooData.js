@@ -64,6 +64,14 @@ var _default = function _default(options) {
       },
       save: function save(state, _ref4) {
         var payload = _ref4.payload;
+        //        console.log( payload )
+        //          console.log('model=',model)
+        //          console.log('old_records=',old_records)
+        //            console.log('id=',id)
+        //            console.log('rec=',rec)
+        //            console.log('old_rec=',old_rec)
+        //            console.log('old_rec=',old_rec)
+        //        console.log( new_state.res_partner )
         var new_state = {};
 
         for (var model in payload) {

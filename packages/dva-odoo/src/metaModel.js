@@ -3,6 +3,11 @@
     read, search, create, write, unlink.
 
   TBD: check and rewrite reducer method.
+  
+  many2one
+  one2many
+  many2many
+  
 */
 
 import modelExtend from 'dva-model-extend';
@@ -57,6 +62,7 @@ const getCallAction = options => {
   };
 };
 
+
 export default options => {
   const {
     model,
@@ -76,25 +82,27 @@ export default options => {
     effects: {
       *call({ payload }, { call, put, select }) {
         const { callback } = payload;
-        let response = {};
+        let data = {};
 
         const token = yield select(state => state.login.sid);
         if (!token) {
-          response = { result: 0, error: { code: 1, msg: 'no login' } };
-        } else {
+          data = { result: 0, error: { code: 1, msg: 'no login' } };
+        }
+        else {
           const { params: params0 } = payload;
           const params1 = { ...params0, model, namespace };
           const params = jsonrpc(_odooCallParams(params1));
           const response0 = yield service(token, params);
           const { result, error } = response0;
-          response = { result };
+          data = { result };
         }
 
         yield put({
           type: callback.type,
           payload: {
+            model,
             params: callback.params,
-            response,
+            data,
           },
         });
       },
@@ -132,74 +140,64 @@ export default options => {
   const extendModel = {
     effects: {
       *read({ payload }, { call, put, select }) {
-        const { id, fields = default_fields, mock = 'read' } = payload;
-        yield put(
-          getCallAction({
-            method: 'read',
-            args: [id, fields],
-            mock,
-            params: payload,
-          })
-        );
+        const fn = (payload)=>{
+          const { id, fields = default_fields, mock = 'read' } = payload;
+          const args = [id, fields];
+          const method = 'read'
+          return getCallAction( { method, args, mock, params: payload } )
+        }
+        yield put( fn( payload ))
       },
 
       *read_callback({ payload }, { call, put, select }) {
-        const {
-          response: { result },
-        } = payload;
-
-        let res1 = {};
-        for (let r of result) {
-          res1[r.id] = r;
+        const { model: model2,params, data } = payload;
+        const response = ( data ) => {
+          const { result } = data;
+          
+          let res1 = {};
+          for (let r of result) {
+            res1[r.id] = r;
+          }
+          return res1
         }
-
-        yield put({ type: 'odooData/update', payload: { model, data: res1 } });
+        const result = response( data )
+        yield put({ type: 'odooData/update', payload: { model:model2, data: result } });
       },
 
       *write({ payload }, { call, put, select }) {
-        const { id, vals, mock = 'write' } = payload;
-        yield put(
-          getCallAction({
-            method: 'write',
-            args: [id, vals],
-            mock,
-            params: payload,
-          })
-        );
+        const fn = (payload)=>{
+          const { id, vals, mock = 'write' } = payload;
+          const args = [id, vals];
+          const method = 'write'
+          return getCallAction( { method, args, mock, params: payload } )
+        }
+        yield put( fn( payload ))
       },
 
       *write_callback({ payload }, { call, put, select }) {
-        const {
-          params: { id, vals },
-          response: { result },
-        } = payload;
+        const { model: model2, params: { id, vals }, data: { result } } = payload;
         if (result) {
           yield put({
             type: 'odooData/update',
-            payload: { model, data: { [id]: vals } },
+            payload: { model:model2, data: { [id]: vals } },
           });
         }
       },
 
       *_search({ payload }, { call, put, select }) {
-        const { domain, mock = 'search' } = payload;
-
-        yield put(
-          getCallAction({
-            method: 'search',
-            args: [domain],
-            mock,
-            callback: '_search_callback',
-            params: payload,
-          })
-        );
+        const fn = (payload) => {
+          const { domain, mock = 'search' } = payload
+          const args = [domain]
+          const method = 'search'
+          const callback = '_search_callback'
+          return getCallAction( { method, args, mock, callback, params: payload } )
+        }
+        yield put( fn( payload ))
       },
 
       *_search_callback({ payload }, { call, put, select }) {
-        const {
-          params: { fields },
-          response: { result },
-        } = payload;
+        const { params:{fields}, data:{result} } = payload;
+
         if (result) {
           yield put({
             type: 'read',
@@ -215,23 +213,18 @@ export default options => {
       },
 
       *nameCreate({ payload }, { call, put, select }) {
-        const { fields = default_fields, name, mock = 'nameCreate' } = payload;
-        yield put(
-          getCallAction({
-            method: 'name_create',
-            args: [name],
-            mock,
-            callback: 'nameCreate_callback',
-            params: payload,
-          })
-        );
+        const fn = (payload)=>{
+          const { fields = default_fields, name, mock = 'nameCreate' } = payload;
+          const args = [name];
+          const method = 'name_create'
+          const callback = 'nameCreate_callback'
+          return getCallAction( { method, args, mock, callback, params: payload } )
+        }
+        yield put( fn( payload ))
       },
 
       *nameCreate_callback({ payload }, { call, put, select }) {
-        const {
-          params: { fields },
-          response: { result },
-        } = payload;
+        const { params: { fields }, data: { result } } = payload;
         if (result) {
           yield put({ type: 'read', payload: { id: result[0], fields } });
           yield put({ type: 'insert', payload: { id: result[0] } });
@@ -239,22 +232,17 @@ export default options => {
       },
 
       *create({ payload }, { call, put, select }) {
-        const { fields = default_fields, vals, mock = 'create' } = payload;
-        yield put(
-          getCallAction({
-            method: 'create',
-            args: [vals],
-            mock,
-            params: payload,
-          })
-        );
+        const fn = (payload)=>{
+          const { fields = default_fields, vals, mock = 'create' } = payload;
+          const args = [vals];
+          const method = 'create'
+          return getCallAction( { method, args, mock, params: payload } )
+        }
+        yield put( fn( payload ))
       },
 
       *create_callback({ payload }, { call, put, select }) {
-        const {
-          params: { fields },
-          response: { result },
-        } = payload;
+        const { params: { fields }, data: { result }} = payload;
         if (result) {
           yield put({ type: 'read', payload: { id: result, fields } });
           yield put({ type: 'insert', payload: { id: result } });
@@ -262,30 +250,25 @@ export default options => {
       },
 
       *unlink({ payload }, { call, put, select }) {
-        const { id, mock = 'unlink' } = payload;
-        yield put(
-          getCallAction({
-            method: 'unlink',
-            args: [id],
-            mock,
-            params: payload,
-          })
-        );
+        const fn = (payload)=>{
+          const { id, mock = 'unlink' } = payload;
+          const args = [id];
+          const method = 'unlink'
+          return getCallAction( { method, args, mock, params: payload } )
+        }
+        yield put( fn( payload ))
       },
 
       *unlink_callback({ payload }, { call, put, select }) {
-        const {
-          params: { id },
-          response: { result },
-        } = payload;
+        const { model: model2, params: { id }, data: { result } } = payload;
         if (result) {
-          yield put({ type: 'odooData/remove', payload: { model, id } });
+          yield put({ type: 'odooData/remove', payload: { model:model2, id } });
           yield put({ type: 'remove', payload: { id } });
         }
       },
     },
   };
-
+  
   return modelExtend(baseModel, {
     ...extendModel,
     namespace: baseModel.namespace,

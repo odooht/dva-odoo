@@ -34,7 +34,7 @@ const create_login = options => {
   //  const dvamodel = loginCreate({ service });
   const dvamodel = loginCreate(options);
 
-  console.log(dvamodel);
+//  console.log(dvamodel);
 
   const { namespace } = dvamodel;
 

@@ -67,3 +67,7 @@ typings/
 /yarn-error.log
 /yarn.lock
 yarn.lock
+
+# 
+packages/dva-odoo/lib/
+packages/dva-odoo-mock/lib/

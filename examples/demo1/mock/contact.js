@@ -1,8 +1,4 @@
 /*
-
-  TBD: new a method named mockCreator in dva-odoo-mock.
-
-
   This is a template for mock data.
   The file name is dva model name.
   The method name is same to a param named of mock,

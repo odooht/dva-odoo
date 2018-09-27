@@ -129,13 +129,15 @@ dva-odoo 扩展包括两种情况,
  
 
 ## 测试
-//* odooApi 是异步函数, 测试时需要一个参数 service
+* 测试 metaModel 需要自己定义一个 service, 并通过 mock 参数传递模拟信息
 * 测试 odooData 需要自己定义一个 service, 并通过 mock 参数传递模拟信息
 
 ---
 
 ## 开发日志:
 
+* 2018-9-27 应用项目的测试方案 ok
+* 2018-9-26 使用 dva 的开发环境, 搭建开发环境, npm 发布
 * 2018-9-25 odooApi 完成历史使命. 代码都集成到 metaModel 中
 * 2018-9-24 测试 ok. odooData 测试完成, 仅有 sid 为空时的分支未测到.
 * 2018-9-23 定义 dva-odoo 扩展方法, 建议命名格式为 dva-odoo-addons-xxx

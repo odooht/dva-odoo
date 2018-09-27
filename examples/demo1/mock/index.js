@@ -17,10 +17,11 @@ import { delay } from 'roadhog-api-doc';
 
 import dvaOdoo from 'dva-odoo-mock'
 
-//TBD: dynamic import all file in mock path
-// 2018-9-18
 import loginModel from './loginModel';
+
+//TBD: dynamic import all file in mock path
 import contact from './contact'
+//TBD: 2018-9-18
 
 const proxy = {
   'POST /api/json/api': (req, res) => {

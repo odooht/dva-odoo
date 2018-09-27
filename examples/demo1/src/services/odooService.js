@@ -1,3 +1,9 @@
+/* TBD 2018-9-27
+   request replaced with mockRequest for test in here
+   we can replace fetch with mockFetch for test in '@/utils/request'
+
+*/
+
 import request  from '@/utils/request'
 
 import proxy from '../../mock'

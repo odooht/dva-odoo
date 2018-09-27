@@ -66,3 +66,4 @@ typings/
 # dependencies
 /yarn-error.log
 /yarn.lock
+yarn.lock

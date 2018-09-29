@@ -100,6 +100,8 @@ class Bridge extends Component {
     render() {
         const { ids, id } = this.props.contact;
 
+        console.log('this.props.contact=', this.props.contact)
+
         const login = this.props.login;
         const {res_partner, res_users} = this.props.odooData;
         const partners = {...res_partner}
@@ -108,6 +110,8 @@ class Bridge extends Component {
         const contacts = lookup(ids, partners);
         const contact = lookup(id, partners);
 
+        console.log('this.props.odooData=', this.props.odooData)
+        console.log('contacts = lookup(ids, this.props.odooData.res_partner): ', contacts)
 
         //    console.log('********render*******', this.props.odoo_data )
 

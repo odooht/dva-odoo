@@ -103,7 +103,8 @@ const test_read = done => {
       //type: 'testbase/read',
       //payload: {id:[1,2]}
       type: 'testbase/search',
-      payload: {domain:[]}
+      payload: {domain:[]},
+      callback: {type:'www', params:{}}
       
     })
     .then( res => {

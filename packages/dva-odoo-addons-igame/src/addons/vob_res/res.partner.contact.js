@@ -10,11 +10,12 @@ export default (options) => {
       effects: {
         *rename({ payload }, { call, put, select }) {
           const fn = (payload) => {
-            const { id, name, mock= 'rename'} = payload;
+            const { id, name, context={}} = payload;
+            const { mock= 'rename' } = context;
             const method = 'write';
             const args = [id, { name }];
-            const callback = 'rename_callback';
-            return { method, args, mock, callback, params:payload} ;
+            const callback = { type: 'rename_callback',params:payload };
+            return { method, args, mock, callback } ;
           }
           yield put({type: 'call', payload: fn(payload) })
         },
@@ -27,10 +28,10 @@ export default (options) => {
         },
 
         *search({ payload }, { call, put, select }) {
-          const { domain=[], fields, mock='search' } = payload;
+          const { domain=[] } = payload;
           const dm1 = [['type','=','contact']]
           yield put({ type: '_search',
-                      payload: { domain:[...domain, ...dm1 ], fields, mock } });
+                      payload: {  ...payload, domain:[...domain, ...dm1 ] } });
 
         },
 

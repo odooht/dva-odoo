@@ -25,10 +25,17 @@ return {
   },
 
   read: (id, fields) => {
-    return [records[id]];
+    if( typeof(id) === 'number' ){
+      return [records[id]];
+    }
+    let res = []
+    for (var ii of id) {
+      res.push(records[ii])
+    }
+    return res
   },
 
-  multiRead: (id, fields) => {
+  multiRead22: (id, fields) => {
     let res = []
     for (var ii of id) {
       res.push(records[ii])

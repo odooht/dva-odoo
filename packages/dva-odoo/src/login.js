@@ -73,7 +73,7 @@ export default options => {
 
       *login_error({ payload }, { call, put, select }) {
         /*  to overwrite this method  */
-        console.log(1232123132)
+        //console.log(1232123132)
       },
     },
 

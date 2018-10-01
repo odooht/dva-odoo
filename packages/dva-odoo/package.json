@@ -1,6 +1,6 @@
 {
   "name": "dva-odoo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A creator of dva model for odoo.",
   "repository": {
     "type": "git",

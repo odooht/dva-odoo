@@ -1,10 +1,10 @@
-import loginModel from './login';
+//import loginMock from './login';
 
 import modelCreators from './models';
 import baseModel from './baseModel';
 
-const getBaseOptions = options => {
-  const { inherit = 'base' } = options ? options : {};
+const getBaseOptions = (options = {}) => {
+  const { inherit = 'base' } = options;
 
   if (inherit === 'base') {
     return options;
@@ -20,36 +20,126 @@ const getBaseOptions = options => {
   return options;
 };
 
-export default ({
-  type,
-  models = {},
-  payload: {
-    url,
-    params: {
-      body: { params },
-    },
-  },
-}) => {
-  if (type === 'login') {
-    return loginModel(models['login']).login(params);
-  }
+const mockServicesCreator = mockData => {
+  const call2 = req => {
+    const params = unpack(req);
+    const { args, kwargs } = params;
+    const { context = {} } = kwargs;
+    const { mock_react_api } = context;
+    const [model, method] = mock_react_api.split('/');
 
-  const { args, kwargs } = params;
-  const { context = {} } = kwargs;
-  const { mock_react_api } = context;
-  const [model, method] = mock_react_api.split('/');
+    const new_options = getBaseOptions(mockData[model]);
+    const { records, extend = [] } = new_options;
 
-  const new_options = getBaseOptions(models[model]);
-  const { records, extend = [] } = new_options;
+    let outModel = baseModel(new_options);
 
-  let outModel = baseModel(new_options);
-  for (var ext of extend) {
-    outModel = { ...outModel, ...ext(new_options) };
-  }
+    for (var ext of extend) {
+      outModel = { ...outModel, ...ext(new_options) };
+    }
 
-  const fn = outModel[method];
-  const jsonrpc = { jsonrpc: 2.0, id: 1 };
-  return fn
-    ? { ...jsonrpc, result: fn(...args, kwargs) }
-    : { ...jsonrpc, error: { code: '1111' } };
+    const fn = outModel[method];
+    const jsonrpc = { jsonrpc: 2.0, id: 1 };
+
+    return { ...jsonrpc, result: fn(...args, kwargs) };
+  };
+
+  const login2 = req => {
+    //      console.log('login mock,', mockData)
+    const { password, login, type } = unpack(req);
+
+    const {
+      login: loginUsers = {
+        admin: {
+          login: 'admin',
+          password: '123',
+          sid: 'sid1',
+          name: 'ss1',
+          uid: 1,
+        },
+      },
+    } = mockData;
+
+    //      console.log('login mock,', loginUsers)
+
+    const user = loginUsers[login];
+    if (user) {
+      const { password: psw, sid = '', uid = 0, name = '' } = user;
+      if (password === psw) {
+        return {
+          jsonrpc: 2.0,
+          id: 1,
+          result: { sid, name, uid, status: 'ok' },
+        };
+      }
+    }
+
+    return {
+      jsonrpc: 2.0,
+      id: 1,
+      result: { status: 'error' },
+    };
+  };
+
+  const unpack = payload => {
+    const { body } = payload;
+    const { params } = body;
+    return params;
+  };
+
+  const call = (req, res) => {
+    const result = call2(req);
+    res.send(result);
+  };
+
+  const login = (req, res) => {
+    const result = login2(req);
+    res.send(result);
+  };
+
+  return { login, call };
 };
+
+export default mockServicesCreator;
+
+/*
+export default (mockData) => {
+  const {login, call } = mockServicesCreator( mockData )
+  const proxy = {
+      'POST /api/json/api':        call,
+      'POST /api/json/user/login': login
+  };
+
+  async function request(url,params){
+    //console.log('request,url,',url, params)
+    const url1 = url.split('?')[0]
+    
+    
+    const fn = proxy['POST '+url1]
+    const response = new Promise( (resolve, reject) => {
+      fn(params, { send(data){
+        const { result, error } = data;
+        if(result){
+          resolve(data)
+        }
+        else{
+          reject(data)
+        }
+      }})
+    })
+
+    const rslt = await response
+      .then( (data) => {
+        return data 
+      })
+//      .catch( (data) => {
+//        console.log('request.result 2,',data)
+//        return data 
+//      })
+    
+    return rslt
+  }
+
+  return { request:request }
+}
+
+*/

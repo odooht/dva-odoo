@@ -16,7 +16,10 @@ export default options => {
   const {
     model,
     namespace,
-    service,
+    api,
+    //    odooApi,
+    odooService,
+
     fields: default_fields = ['name'],
   } = options;
 
@@ -28,45 +31,7 @@ export default options => {
       id: 0,
     },
 
-    effects: {
-      *call({ payload }, { call, put, select }) {
-        let data = {};
-
-        let token = yield select(state => state.login.sid);
-
-        if (!token) {
-          data = { result: 0, error: { code: 1, msg: 'no login' } };
-        } else {
-          const { method, args, kwargs = {}, mock } = payload;
-          const { context } = kwargs;
-          //const {mock} = context;
-          const mock_react_api = namespace + '/' + mock;
-
-          const params = {
-            method: 'POST',
-            body: {
-              jsonrpc: 2.0,
-              id: 1,
-              method: 'call',
-              params: {
-                model,
-                method,
-                args,
-                kwargs: { ...kwargs, context: { ...context, mock_react_api } },
-              },
-            },
-          };
-
-          const response0 = yield service(token, params);
-          const { result, error } = response0;
-          data = { result };
-        }
-
-        const { method, callback } = payload;
-        const { type = method + '_callback', params } = callback;
-        yield put({ type, payload: { model, params, data } });
-      },
-    },
+    effects: {},
 
     reducers: {
       view(state, { payload }) {
@@ -80,7 +45,8 @@ export default options => {
       insert(state, { payload }) {
         const { ids } = state;
         const { id } = payload;
-        return { ...state, ids: [id, ...ids], id };
+        const nids = id in ids ? ids : [id, ...ids];
+        return { ...state, ids: nids, id };
       },
 
       remove(state, { payload }) {
@@ -99,167 +65,170 @@ export default options => {
 
   const extendModel = {
     effects: {
-      *read({ payload }, { call, put, select }) {
-        const fn = payload => {
-          const { id, fields = default_fields, context = {} } = payload;
-          const { mock = 'read' } = context;
-          const kwargs = { context: { ...context, mock } };
-          const args = [id, fields];
-          const method = 'read';
-          const callback = { params: payload };
-          return { method, args, kwargs, mock, callback };
-        };
-        yield put({ type: 'call', payload: fn(payload) });
-      },
-
-      *read_callback({ payload }, { call, put, select }) {
-        const { model: model2, params, data } = payload;
-        const response = data => {
-          const { result } = data;
-          let res1 = {};
-          for (let r of result) {
-            res1[r.id] = r;
-          }
-          return res1;
-        };
-        const result = response(data);
-        yield put({
-          type: 'odooData/update',
-          payload: { model: model2, data: result },
+      *search({ payload }, { call, put, select }) {
+        const token = yield select(state => state.login.sid);
+        const response = yield api.search(token, {
+          model,
+          namespace,
+          ...payload,
         });
+
+        const { result, error } = response;
+
+        if (result) {
+          const { fields = default_fields } = payload;
+          const response2 = yield api.read(token, {
+            id: result,
+            fields,
+            model,
+            namespace,
+          });
+
+          const { result: result2, error: error2 } = response2;
+          if (result2) {
+            yield put({
+              type: 'odooData/update',
+              payload: { model, data: result2 },
+            });
+
+            yield put({ type: 'save', payload: { ids: result } });
+          }
+        }
       },
 
-      *write({ payload }, { call, put, select }) {
-        const fn = payload => {
-          const { id, vals, context = {} } = payload;
-          const { mock = 'write' } = context;
-          const kwargs = { context: { ...context, mock } };
-          const args = [id, vals];
-          const method = 'write';
-          const callback = { params: payload };
-          return { method, args, kwargs, mock, callback };
-        };
-        yield put({ type: 'call', payload: fn(payload) });
-      },
+      *searchRead({ payload }, { call, put, select }) {
+        const token = yield select(state => state.login.sid);
+        const response = yield api.searchRead(token, {
+          model,
+          namespace,
+          ...payload,
+        });
 
-      *write_callback({ payload }, { call, put, select }) {
-        const {
-          model: model2,
-          params: { id, vals },
-          data: { result },
-        } = payload;
+        const { result, error } = response;
         if (result) {
           yield put({
             type: 'odooData/update',
-            payload: { model: model2, data: { [id]: vals } },
+            payload: { model, data: result },
           });
+          const ids = result.map(item => item.id);
+          yield put({ type: 'save', payload: { ids } });
         }
       },
 
-      *_search({ payload }, { call, put, select }) {
-        const fn = payload => {
-          const { domain, context = {} } = payload;
-          const { mock = 'search' } = context;
-          const kwargs = { context: { ...context, mock } };
-          const args = [domain];
-          const method = 'search';
-          const callback = { type: '_search_callback', params: payload };
-          return { method, args, kwargs, mock, callback };
-        };
-        yield put({ type: 'call', payload: fn(payload) });
-      },
-
-      *_search_callback({ payload }, { call, put, select }) {
-        const {
-          params: { fields },
-          data: { result },
-        } = payload;
+      *read({ payload }, { call, put, select }) {
+        const token = yield select(state => state.login.sid);
+        const response = yield api.read(token, {
+          model,
+          namespace,
+          ...payload,
+        });
+        const { result, error } = response;
 
         if (result) {
           yield put({
-            type: 'read',
-            payload: { id: result, fields },
+            type: 'odooData/update',
+            payload: { model, data: result },
           });
-          yield put({ type: 'save', payload: { ids: result } });
+
+          /*??? TBD how to update ids and id  */
         }
       },
 
-      *search({ payload }, { call, put, select }) {
-        /* to be overridden, to set domain and fields */
-        yield put({ type: '_search', payload });
+      *write({ payload }, { call, put, select }) {
+        const token = yield select(state => state.login.sid);
+        const response = yield api.write(token, {
+          model,
+          namespace,
+          ...payload,
+        });
+
+        const { result, error } = response;
+
+        if (result) {
+          const { id, vals } = payload;
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: [{ ...vals, id }] },
+          });
+        }
       },
 
       *nameCreate({ payload }, { call, put, select }) {
-        const fn = payload => {
-          const { fields = default_fields, name, context = {} } = payload;
-          const { mock = 'nameCreate' } = context;
-          const kwargs = { context: { ...context, mock } };
-          const args = [name];
-          const method = 'name_create';
-          const callback = { type: 'nameCreate_callback', params: payload };
-          return { method, args, kwargs, mock, callback };
-        };
-        yield put({ type: 'call', payload: fn(payload) });
-      },
+        const token = yield select(state => state.login.sid);
+        const response = yield api.nameCreate(token, {
+          model,
+          namespace,
+          ...payload,
+        });
 
-      *nameCreate_callback({ payload }, { call, put, select }) {
-        const {
-          params: { fields },
-          data: { result },
-        } = payload;
+        const { result, error } = response;
         if (result) {
-          yield put({ type: 'read', payload: { id: result[0], fields } });
-          yield put({ type: 'insert', payload: { id: result[0] } });
+          const { fields = default_fields } = payload;
+          const response2 = yield api.read(token, {
+            id: result[0],
+            fields,
+            model,
+            namespace,
+          });
+
+          const { result: result2, error: error2 } = response2;
+          if (result2) {
+            yield put({
+              type: 'odooData/update',
+              payload: { model, data: result2 },
+            });
+
+            yield put({ type: 'insert', payload: { id: result[0] } });
+          }
         }
       },
 
       *create({ payload }, { call, put, select }) {
-        const fn = payload => {
-          const { fields = default_fields, vals, context = {} } = payload;
-          const { mock = 'create' } = context;
-          const kwargs = { context: { ...context, mock } };
-          const args = [vals];
-          const method = 'create';
-          const callback = { params: payload };
-          return { method, args, kwargs, mock, callback };
-        };
-        yield put({ type: 'call', payload: fn(payload) });
-      },
+        const token = yield select(state => state.login.sid);
 
-      *create_callback({ payload }, { call, put, select }) {
-        const {
-          params: { fields },
-          data: { result },
-        } = payload;
+        const response = yield api.create(token, {
+          ...payload,
+          model,
+          namespace,
+        });
+
+        const { result, error } = response;
+
         if (result) {
-          yield put({ type: 'read', payload: { id: result, fields } });
-          yield put({ type: 'insert', payload: { id: result } });
+          const { fields = default_fields } = payload;
+          const response2 = yield api.read(token, {
+            id: result,
+            fields,
+            model,
+            namespace,
+          });
+
+          const { result: result2, error: error2 } = response2;
+          if (result2) {
+            yield put({
+              type: 'odooData/update',
+              payload: { model, data: result2 },
+            });
+
+            yield put({ type: 'insert', payload: { id: result } });
+          }
         }
       },
 
       *unlink({ payload }, { call, put, select }) {
-        const fn = payload => {
-          const { id, context = {} } = payload;
-          const { mock = 'unlink' } = context;
-          const kwargs = { context: { ...context, mock } };
-          const args = [id];
-          const method = 'unlink';
-          const callback = { params: payload };
-          return { method, args, kwargs, mock, callback };
-        };
-        yield put({ type: 'call', payload: fn(payload) });
-      },
+        const token = yield select(state => state.login.sid);
+        const response = yield api.unlink(token, {
+          model,
+          namespace,
+          ...payload,
+        });
 
-      *unlink_callback({ payload }, { call, put, select }) {
-        const {
-          model: model2,
-          params: { id },
-          data: { result },
-        } = payload;
+        const { result, error } = response;
         if (result) {
+          const { id } = payload;
           yield put({
             type: 'odooData/remove',
-            payload: { model: model2, id },
+            payload: { model, id },
           });
           yield put({ type: 'remove', payload: { id } });
         }

@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "umi dev",
+    "start:no-mock": "cross-env MOCK=none umi dev",
+    "build": "umi build",
+    "test": "cross-env MOCK=true umi test",
+    "lint": "eslint --ext .js src mock tests",
+    "precommit": "lint-staged"
+  },
+  "devDependencies": {
+    "babel-eslint": "^9.0.0",
+    "eslint": "^5.4.0",
+    "eslint-config-umi": "^0.1.5",
+    "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.2.2",
+    "umi": "^2.0.0-0",
+    "umi-plugin-react": "^1.0.0-0",
+
+    "cross-env": "^5.1.1",
+    "roadhog-api-doc": "^1.1.2",
+    "dva-odoo": "^0.1.1",
+    "dva-odoo-mock": "^0.1.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": ["eslint --fix", "git add"]
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}

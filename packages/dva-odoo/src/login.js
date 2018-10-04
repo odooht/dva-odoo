@@ -5,6 +5,8 @@
    3 call userinfo?
 */
 
+//import dvaOdooServices from './odooServices';
+
 const jsonrpc = params => {
   return {
     method: 'POST',
@@ -17,11 +19,9 @@ const jsonrpc = params => {
   };
 };
 
-export default options => {
-  const { namespace = 'login', service } = options;
-
+export default loginService => {
   return {
-    namespace: namespace,
+    namespace: 'login',
 
     state: {
       sid: '',
@@ -30,7 +30,7 @@ export default options => {
 
     effects: {
       *login({ payload, callback, success, error }, { call, put, select }) {
-        const response = yield service(jsonrpc(payload));
+        const response = yield loginService(jsonrpc(payload));
         const { result, error: errormsg } = response;
         // response.error,  error code is always 200, send by odoo.
         // error msg is odoo exception
@@ -59,10 +59,10 @@ export default options => {
           // ? how to update state?
           yield put({ type: 'login_error', payload: data });
           if (callback) {
-            callback(data);
+            //callback(data);
           }
           if (error) {
-            error(data);
+            //error(data);
           }
         }
       },

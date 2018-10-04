@@ -5,7 +5,19 @@ function dot2line(model) {
   return model.replace('.', '_');
 }
 
-export default options => {
+const list2dict = result => {
+  if (result) {
+    let res1 = {};
+    for (let r of result) {
+      res1[r.id] = r;
+    }
+    return res1;
+  } else {
+    return result;
+  }
+};
+
+export default () => {
   return {
     namespace: 'odooData',
 
@@ -17,7 +29,10 @@ export default options => {
     effects: {
       *update({ payload }, { call, put, select }) {
         const { model, data } = payload;
-        yield put({ type: 'save', payload: { [dot2line(model)]: data } });
+        yield put({
+          type: 'save',
+          payload: { [dot2line(model)]: list2dict(data) },
+        });
       },
     },
 
@@ -31,7 +46,6 @@ export default options => {
       },
 
       save(state, { payload }) {
-
         const new_state = {};
         for (var model in payload) {
           const new_records = {};
@@ -45,7 +59,7 @@ export default options => {
           }
           new_state[model] = { ...old_records, ...new_records };
         }
-        
+
         return { ...state, ...new_state };
       },
     },

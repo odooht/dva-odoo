@@ -55,6 +55,9 @@ describe('dva-odoo', () => {
     test_search_read_findOrCreate(done);
     done();
   });
+
+  /*
+*/
 });
 
 import { call, put, select } from 'redux-saga/effects';
@@ -109,14 +112,8 @@ const serviceFile = () => {
     mock: 1,
     proxy,
     service: {
-      call: {
-        url: '/api/json/api',
-      },
-
-      login: {
-        url: '/api/json/user/login',
-        db: 'TT',
-      },
+      call: { url: '/api/json/api' },
+      login: { url: '/api/json/user/login', db: 'TT' },
     },
   };
   return service;
@@ -128,9 +125,9 @@ const getApp = () => {
   const app = dva();
 
   const model = dvaOdoo({
+    inherit: 'res.partner',
     model: 'res.partner',
     namespace: 'contact',
-    inherit: 'res.partner',
     service,
   });
   //  console.log('model:',model);

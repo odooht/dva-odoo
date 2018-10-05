@@ -10,60 +10,21 @@
 
 */
 
-import modelExtend from 'dva-model-extend';
+import odooApiCreator from './odooApi';
 
-export default options => {
-  const {
-    model,
+const dvaModel = ({
+  model,
+  namespace,
+  api,
+  fields: default_fields = ['name'],
+}) => {
+  return {
     namespace,
-    api,
-    //    odooApi,
-    odooService,
-
-    fields: default_fields = ['name'],
-  } = options;
-
-  const baseModel = {
-    namespace: namespace,
-
     state: {
       ids: [],
       id: 0,
     },
 
-    effects: {},
-
-    reducers: {
-      view(state, { payload }) {
-        const { id: pid } = payload;
-        const { id: oid, ids: oids } = state;
-
-        const id = pid && pid in oids ? pid : oid;
-        return { ...state, id };
-      },
-
-      insert(state, { payload }) {
-        const { ids } = state;
-        const { id } = payload;
-        const nids = id in ids ? ids : [id, ...ids];
-        return { ...state, ids: nids, id };
-      },
-
-      remove(state, { payload }) {
-        const { ids: oids, id: oid } = state;
-        const { id: pid } = payload;
-        const ids = oids.filter(i => i != pid);
-        const id = oid != pid ? oid : 0;
-        return { ...state, ids, id };
-      },
-
-      save(state, { payload }) {
-        return { ...state, ...payload };
-      },
-    },
-  };
-
-  const extendModel = {
     effects: {
       *search({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
@@ -130,7 +91,7 @@ export default options => {
             payload: { model, data: result },
           });
 
-          /*??? TBD how to update ids and id  */
+          // ??? TBD how to update ids and id
         }
       },
 
@@ -234,10 +195,40 @@ export default options => {
         }
       },
     },
-  };
 
-  return modelExtend(baseModel, {
-    ...extendModel,
-    namespace: baseModel.namespace,
-  });
+    reducers: {
+      view(state, { payload }) {
+        const { id: pid } = payload;
+        const { id: oid, ids: oids } = state;
+
+        const id = pid && pid in oids ? pid : oid;
+        return { ...state, id };
+      },
+
+      insert(state, { payload }) {
+        const { ids } = state;
+        const { id } = payload;
+        const nids = id in ids ? ids : [id, ...ids];
+        return { ...state, ids: nids, id };
+      },
+
+      remove(state, { payload }) {
+        const { ids: oids, id: oid } = state;
+        const { id: pid } = payload;
+        const ids = oids.filter(i => i != pid);
+        const id = oid != pid ? oid : 0;
+        return { ...state, ids, id };
+      },
+
+      save(state, { payload }) {
+        return { ...state, ...payload };
+      },
+    },
+  };
+};
+
+export default {
+  odooApi: odooApiCreator,
+  // {create,read,search,unlink,write} = odooApi
+  dvaModel,
 };

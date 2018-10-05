@@ -5,7 +5,7 @@ const getParams = (payload, mock_default) => {
   return { ...payload, context: { ...context, mock_react_api } };
 };
 
-const odooApiCreator = odooCall => {
+export default ({ odooCall }) => {
   const search = async (token, params) => {
     const { model, domain, context } = getParams(params, 'search');
     const method = 'search';
@@ -106,9 +106,4 @@ const odooApiCreator = odooCall => {
     nameCreate,
     unlink,
   };
-};
-
-export default call => {
-  const api = odooApiCreator(call);
-  return api;
 };

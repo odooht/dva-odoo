@@ -1,18 +1,13 @@
-import addons from './addons'
+import addons from './addons';
 
-export default (options) => {
-    const {inherit='base', extend } = options;
+export default options => {
+  const { inherit = 'base' } = options;
 
-    const create = addons[inherit];
+  const create = addons[inherit];
 
-    if ( ! create ){
-      return { ...options, inherit }
-    }
+  if (!create) {
+    return options;
+  }
 
-    return create( options );
-
-}
-
-
-
-
+  return create(options);
+};

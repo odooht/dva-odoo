@@ -1,7 +1,8 @@
-//import fetchRequest form '@utils/request'
-const fetchRequest = () => {};
+export default service => {
+  const {
+    call: { proxy, request },
+  } = service;
 
-export default ({ service, mock, proxy }) => {
   async function mockRequest(url, params) {
     //console.log('request,url,',url, params)
     const url1 = url.split('?')[0];
@@ -31,7 +32,7 @@ export default ({ service, mock, proxy }) => {
     return rslt;
   }
 
-  const request = mock ? mockRequest : fetchRequest;
+  const req = proxy ? mockRequest : request;
 
   const login = async params => {
     // TBD jsonrpc  move here
@@ -44,7 +45,7 @@ export default ({ service, mock, proxy }) => {
       body: { ...body, params: { ...params2, db } },
     };
 
-    return await request(url, new_params);
+    return await req(url, new_params);
   };
 
   const call = async (token, params) => {
@@ -53,7 +54,7 @@ export default ({ service, mock, proxy }) => {
     const { url: url0 } = service.call;
     const now = Date.now();
     const url = `${url0}?session_id=${token}&_now=${now}`;
-    return request(url, {
+    return req(url, {
       method: 'POST',
       body: {
         jsonrpc: 2.0,

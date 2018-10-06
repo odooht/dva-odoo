@@ -10,50 +10,39 @@ import metaModelCreate from './metaModel';
 import modelCreators from './addons';
 
 const create_normal = ({ options, odooCall }) => {
-  const { inherit, model: odooModel, namespace, odooApi, dvaModel } = options;
-
-  const getNewOptions = ({
-    inherit = 'base',
-    model,
-    apis = [],
-    extend = [],
-  }) => {
+  const getNewOptions = child => {
+    const { inherit = 'base' } = child;
     const creator = modelCreators[inherit];
     if (creator) {
-      const {
-        model: pModel,
-        inherit: pInherit,
-        odooApi: pApi,
-        dvaModel: pDavModel,
-      } = creator;
-      const new_apis = pApi ? [pApi] : [];
-      const new_extend = pDavModel ? [pDavModel] : [];
-      return getNewOptions({
-        inherit: pInherit,
-        model: model ? model : pModel,
-        apis: [...new_apis, ...apis],
-        extend: [...new_extend, ...extend],
-      });
+      const parent = creator(child);
+      return getNewOptions(parent);
     } else {
-      const { odooApi: BaseApi, dvaModel: baseModel } = metaModelCreate;
-      return {
-        model,
-        apis: [BaseApi, ...apis],
-        extend: [baseModel, ...extend],
-      };
+      return metaModelCreate(child);
     }
   };
+
+  const {
+    inherit,
+    model: odooModel,
+    namespace,
+    fields,
+    odooApi,
+    dvaModel, // out model is a leaf model
+    apis: outApis = [],
+    extend: outExtend = [], // out model is with a parent
+  } = options;
 
   const { model, apis = [], extend = [] } = getNewOptions({
     inherit,
     model: odooModel,
-    apis: odooApi ? [odooApi] : [],
-    extend: dvaModel ? [dvaModel] : [],
+    apis: odooApi ? [...outApis, odooApi] : outApis,
+    extend: dvaModel ? [...outExtend, dvaModel] : outExtend,
   });
 
   let api = {};
   for (const apiCreators of apis) {
-    api = { ...api, ...apiCreators({ model, namespace, odooCall, api }) };
+    const ppp = apiCreators({ model, namespace, fields, odooCall, api });
+    api = { ...api, ...ppp };
   }
 
   let outModel = {};

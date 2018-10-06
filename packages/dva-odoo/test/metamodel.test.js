@@ -1,7 +1,9 @@
 import dvaOdoo from '../src/index';
 import dvaOdooMock from '../../dva-odoo-mock/src/index';
+import dvaOdooGame from '../../dva-odoo-addons-igame/src/index';
 
 import dva from 'dva';
+import { call, put, select } from 'redux-saga/effects';
 
 describe('dva-odoo', () => {
   it('login ok', done => {
@@ -38,7 +40,6 @@ describe('dva-odoo', () => {
     test_search_read_create(done);
     done();
   });
-
   it('name create ok', done => {
     test_search_read_name_create(done);
     done();
@@ -55,12 +56,7 @@ describe('dva-odoo', () => {
     test_search_read_findOrCreate(done);
     done();
   });
-
-  /*
-*/
 });
-
-import { call, put, select } from 'redux-saga/effects';
 
 // mock folder
 const mockContact = () => {
@@ -106,15 +102,10 @@ const mockIndex = () => {
 
 // service folder
 const serviceFile = () => {
-  //import mock from '.odoorc'
   const proxy = mockIndex();
   const service = {
-    mock: 1,
-    proxy,
-    service: {
-      call: { url: '/api/json/api' },
-      login: { url: '/api/json/user/login', db: 'TT' },
-    },
+    call: { url: '/api/json/api', proxy },
+    login: { url: '/api/json/user/login', db: 'TT' },
   };
   return service;
 };
@@ -124,12 +115,16 @@ const getApp = () => {
   const service = serviceFile();
   const app = dva();
 
-  const model = dvaOdoo({
-    inherit: 'res.partner',
-    model: 'res.partner',
-    namespace: 'contact',
-    service,
-  });
+  const model = dvaOdoo(
+    dvaOdooGame({
+      inherit: 'res.partner.contact',
+      //model: 'res.partner',
+      namespace: 'contact',
+      feilds: ['name'],
+      service,
+    })
+  );
+
   //  console.log('model:',model);
 
   expect(model.namespace).toEqual('contact');

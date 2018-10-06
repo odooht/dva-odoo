@@ -5,7 +5,7 @@ const getParams = (payload, mock_default) => {
   return { ...payload, context: { ...context, mock_react_api } };
 };
 
-export default ({ odooCall }) => {
+const apiCreator = ({ fields: default_fields = ['name'], odooCall }) => {
   const search = async (token, params) => {
     const { model, domain, context } = getParams(params, 'search');
     const method = 'search';
@@ -20,7 +20,10 @@ export default ({ odooCall }) => {
   };
 
   const searchRead = async (token, params) => {
-    const { model, domain, fields, context } = getParams(params, 'searchRead');
+    const { model, domain, fields = default_fields, context } = getParams(
+      params,
+      'searchRead'
+    );
     const method = 'search_read';
     const response = await odooCall(token, {
       model,
@@ -33,7 +36,10 @@ export default ({ odooCall }) => {
   };
 
   const read = async (token, params) => {
-    const { model, id, fields, context } = getParams(params, 'read');
+    const { model, id, fields = default_fields, context } = getParams(
+      params,
+      'read'
+    );
     const method = 'read';
     const response = await odooCall(token, {
       model,
@@ -60,6 +66,7 @@ export default ({ odooCall }) => {
 
   const create = async (token, params) => {
     const { model, vals, context } = getParams(params, 'create');
+
     const method = 'create';
     const response = await odooCall(token, {
       model,
@@ -68,6 +75,7 @@ export default ({ odooCall }) => {
       kwargs: { context },
     });
     const { result, error } = response;
+
     return { result, error };
   };
 
@@ -105,5 +113,50 @@ export default ({ odooCall }) => {
     create,
     nameCreate,
     unlink,
+  };
+};
+
+export default ({ fields: default_fields = ['name'], odooCall }) => {
+  const api = apiCreator({ fields: default_fields, odooCall });
+
+  const createRead = async (token, params) => {
+    const { model, vals, fields = default_fields, namespace } = params;
+    const response = await api.create(token, { model, vals, namespace });
+    const { result: result0, error: error0 } = response;
+
+    if (result0) {
+      const response2 = await api.read(token, {
+        model,
+        id: result0,
+        fields,
+        namespace,
+      });
+      const { result, error } = response2;
+      return { result, error };
+    }
+    return { result: result0, error: error0 };
+  };
+
+  const nameCreateRead = async (token, params) => {
+    const { model, name, fields = default_fields, namespace } = params;
+    const response = await api.nameCreate(token, { model, name, namespace });
+    const { result: result0, error: error0 } = response;
+    if (result0) {
+      const response2 = await api.read(token, {
+        model,
+        id: result0[0],
+        fields,
+        namespace,
+      });
+      const { result, error } = response2;
+      return { result, error };
+    }
+    return { result: result0, error: error0 };
+  };
+
+  return {
+    ...api,
+    createRead,
+    nameCreateRead,
   };
 };

@@ -10,13 +10,13 @@
 
 */
 
-import odooApiCreator from './odooApi';
+import odooApi from './odooApi';
 
 const dvaModel = ({
   model,
   namespace,
   api,
-  fields: default_fields = ['name'],
+  //  fields: default_fields = ['name'],
 }) => {
   return {
     namespace,
@@ -28,7 +28,7 @@ const dvaModel = ({
     effects: {
       *search({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.search(token, {
+        const response = yield api.searchRead(token, {
           model,
           namespace,
           ...payload,
@@ -37,23 +37,12 @@ const dvaModel = ({
         const { result, error } = response;
 
         if (result) {
-          const { fields = default_fields } = payload;
-          const response2 = yield api.read(token, {
-            id: result,
-            fields,
-            model,
-            namespace,
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: result },
           });
-
-          const { result: result2, error: error2 } = response2;
-          if (result2) {
-            yield put({
-              type: 'odooData/update',
-              payload: { model, data: result2 },
-            });
-
-            yield put({ type: 'save', payload: { ids: result } });
-          }
+          const ids = result.map(item => item.id);
+          yield put({ type: 'save', payload: { ids } });
         }
       },
 
@@ -116,7 +105,7 @@ const dvaModel = ({
 
       *nameCreate({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.nameCreate(token, {
+        const response = yield api.nameCreateRead(token, {
           model,
           namespace,
           ...payload,
@@ -124,30 +113,17 @@ const dvaModel = ({
 
         const { result, error } = response;
         if (result) {
-          const { fields = default_fields } = payload;
-          const response2 = yield api.read(token, {
-            id: result[0],
-            fields,
-            model,
-            namespace,
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: result },
           });
-
-          const { result: result2, error: error2 } = response2;
-          if (result2) {
-            yield put({
-              type: 'odooData/update',
-              payload: { model, data: result2 },
-            });
-
-            yield put({ type: 'insert', payload: { id: result[0] } });
-          }
+          yield put({ type: 'insert', payload: { id: result[0].id } });
         }
       },
 
       *create({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-
-        const response = yield api.create(token, {
+        const response = yield api.createRead(token, {
           ...payload,
           model,
           namespace,
@@ -156,23 +132,11 @@ const dvaModel = ({
         const { result, error } = response;
 
         if (result) {
-          const { fields = default_fields } = payload;
-          const response2 = yield api.read(token, {
-            id: result,
-            fields,
-            model,
-            namespace,
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: result },
           });
-
-          const { result: result2, error: error2 } = response2;
-          if (result2) {
-            yield put({
-              type: 'odooData/update',
-              payload: { model, data: result2 },
-            });
-
-            yield put({ type: 'insert', payload: { id: result } });
-          }
+          yield put({ type: 'insert', payload: { id: result[0].id } });
         }
       },
 
@@ -194,17 +158,18 @@ const dvaModel = ({
           yield put({ type: 'remove', payload: { id } });
         }
       },
+
+      *view({ payload }, { call, put, select }) {
+        const { id: pid } = payload;
+        const { id: oid, ids: oids } = yield select(state => state[namespace]);
+
+        if (oids.indexOf(pid) >= 0) {
+          yield put({ type: 'save', payload: { id: pid } });
+        }
+      },
     },
 
     reducers: {
-      view(state, { payload }) {
-        const { id: pid } = payload;
-        const { id: oid, ids: oids } = state;
-
-        const id = pid && pid in oids ? pid : oid;
-        return { ...state, id };
-      },
-
       insert(state, { payload }) {
         const { ids } = state;
         const { id } = payload;
@@ -227,8 +192,11 @@ const dvaModel = ({
   };
 };
 
-export default {
-  odooApi: odooApiCreator,
-  // {create,read,search,unlink,write} = odooApi
-  dvaModel,
+export default child => {
+  const { apis = [], extend = [] } = child;
+  return {
+    ...child,
+    apis: [odooApi, ...apis],
+    extend: [dvaModel, ...extend],
+  };
 };

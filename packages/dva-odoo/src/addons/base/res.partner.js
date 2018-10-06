@@ -1,40 +1,22 @@
-const dvaModel = ({
-  namespace,
-  model,
-  api,
-  fields: default_fields = ['name'],
-}) => {
+const dvaModel = ({ namespace, model, api }) => {
   return {
     namespace,
     state: {},
     effects: {
       *findOrCreate({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.findOrCreate(token, {
+        const response = yield api.findOrCreateRead(token, {
           model,
           namespace,
           ...payload,
         });
         const { result, error } = response;
-
         if (result) {
-          const { fields = default_fields } = payload;
-          const response2 = yield api.read(token, {
-            id: result,
-            fields,
-            model,
-            namespace,
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: result },
           });
-
-          const { result: result2, error: error2 } = response2;
-          if (result2) {
-            yield put({
-              type: 'odooData/update',
-              payload: { model, data: result2 },
-            });
-
-            yield put({ type: 'insert', payload: { id: result } });
-          }
+          yield put({ type: 'insert', payload: { id: result[0].id } });
         }
       },
     },
@@ -42,8 +24,14 @@ const dvaModel = ({
   };
 };
 
-const odooApi = ({ model, namespace, odooCall, api }) => {
-  return {
+const odooApi = ({
+  model,
+  namespace,
+  fields: default_fields = ['name'],
+  odooCall,
+  api,
+}) => {
+  const api2 = {
     findOrCreate: async (token, params) => {
       const { email, context = {} } = params;
       const { mock = 'findOrCreate' } = context;
@@ -60,11 +48,37 @@ const odooApi = ({ model, namespace, odooCall, api }) => {
       return { result, error };
     },
   };
+
+  return {
+    ...api2,
+    findOrCreateRead: async (token, params) => {
+      const { fields = default_fields } = params;
+      const response = await api2.findOrCreate(token, params);
+      const { result: result0, error: error0 } = response;
+
+      if (result0) {
+        const response2 = await api.read(token, {
+          model,
+          id: result0,
+          fields,
+          namespace,
+        });
+        const { result, error } = response2;
+        return { result, error };
+      }
+      return { result: result0, error: error0 };
+    },
+  };
 };
 
-export default {
-  model: 'res.partner',
-  inherit: 'base',
-  odooApi,
-  dvaModel,
+export default child => {
+  const { apis = [], extend = [] } = child;
+
+  return {
+    ...child,
+    model: 'res.partner',
+    inherit: 'base',
+    apis: [odooApi, ...apis],
+    extend: [dvaModel, ...extend],
+  };
 };

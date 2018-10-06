@@ -1,52 +1,65 @@
-
-export default (options) => {
-  const { namespace, extend=[], fields: default_fields=['name'] } = options;
-
-  const parent = ({namespace}) => {
-    return {
-      namespace: namespace,
-      state: {
-      },
-      effects: {
-        *rename({ payload }, { call, put, select }) {
-          const fn = (payload) => {
-            const { id, name, context={}} = payload;
-            const { mock= 'rename' } = context;
-            const method = 'write';
-            const args = [id, { name }];
-            const callback = { type: 'rename_callback',params:payload };
-            return { method, args, mock, callback } ;
-          }
-          yield put({type: 'call', payload: fn(payload) })
-        },
-
-        *rename_callback({ payload  }, { call, put, select }){
-          const {params: { id, name }, data: result } = payload;
-          if(result){
-            yield put({ type: 'read', payload: {id, fields:default_fields } })
-          }
-        },
-
-        *search({ payload }, { call, put, select }) {
-          const { domain=[] } = payload;
-          const dm1 = [['type','=','contact']]
-          yield put({ type: '_search',
-                      payload: {  ...payload, domain:[...domain, ...dm1 ] } });
-
-        },
-
-      },
-
-      reducers: {
-      },
-
-    }
-  }
-
+const dvaModel = ({
+  namespace,
+  model,
+  api,
+  fields: default_fields = ['name'],
+}) => {
   return {
-     ...options,
-     inherit:'res.partner',
-     extend: [parent,...extend]
-  }
+    namespace,
+    state: {},
+    effects: {
+      *rename({ payload }, { call, put, select }) {
+        const token = yield select(state => state.login.sid);
+        const response = yield api.rename(token, {
+          model,
+          namespace,
+          ...payload,
+        });
+        const { result, error } = response;
+        if (result) {
+          const { id, name } = payload;
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: [{ id, name }] },
+          });
+        }
+      },
+    },
+    reducers: {},
+  };
+};
 
-}
+const odooApi = ({ model, namespace, odooCall, api }) => {
+  return {
+    searchRead: async (token, params) => {
+      const { domain = [] } = params;
+      const dm1 = [['type', '=', 'contact']];
+      return api.searchRead(token, { ...params, domain: [...domain, ...dm1] });
+    },
+
+    rename: async (token, params) => {
+      const { id, name, context = {} } = params;
+      const { mock = 'rename' } = context;
+      const mock_react_api = namespace + '/' + mock;
+      const response = await api.write(token, {
+        model,
+        id,
+        name,
+        kwargs: { context: { ...context, mock_react_api } },
+      });
+
+      const { result, error } = response;
+      return { result, error };
+    },
+  };
+};
+
+export default child => {
+  const { apis = [], extend = [] } = child;
+  return {
+    ...child,
+    inherit: 'res.partner',
+    apis: [odooApi, ...apis],
+    extend: [dvaModel, ...extend],
+  };
+};

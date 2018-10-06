@@ -7,31 +7,93 @@ version: 0.1.0
 
 odooServices 是.....
 
-## 使用方法
+
+
+---
+在 services 文件夹下建立文件 service.js
 
 ```
-import odooServices from '@/services/odooservice'
-import dvaodoo from 'dva-odoo'
+import mock from '.odoorc'
+import proxy = ../../mock/index;
 
-const a_dva_mode = dvaodoo({
-  model: 'res.partner',
+const service = {
+    mock: 1,
+    proxy,
+    service: {
+      call: { url: '/api/json/api' },
+      login: { url: '/api/json/user/login', db: 'TT' },
+    },
+}
+
+export default service
+
+```
+---
+在 models 文件夹下建立 odooData.js
+```
+import dvaOdoo from 'dva-odoo'
+export default dvaOdoo({
+  inherit: 'odooData'
+})
+
+```
+
+在 models 文件夹下建立 login.js
+```
+import dvaOdoo from 'dva-odoo'
+import service from '@services/service'
+export default dvaOdoo({
+  inherit: 'login',
+  service,
+  extned:{
+    effects:{
+      *newMethod(){}
+    }
+  }
+})
+
+```
+## 使用方法
+```
+import dvaOdoo from 'dva-odoo'
+import service from '@services/service'
+export default dvaOdoo({
   inherit: 'res.partner',
-  namespace: 'customer',
-  service: odooServices.call,
-  extend: [(options)=>{
-    const {namespace, model, service} = options
+  namespace: 'contact',
+  service,
+  model: 'res.partner',
+  odooApi: ({ model, namespace, odooCall, api })=> {
+    return {
+      theMethod: async (token, params) =>{
+        return odooCall(token,params: {model,...})
+        return api.read(token,params: {model,...})
+      }
+    }
+  },
+  dvaModel: ({namespace, model, api, fields}) => {
     return {
       namespace: namespace,
       state:{
       },
       
       effect:{
+        *aMethod: (){
+          yield api.theMethod()
+          odooCall()
+        }
       },
       
       reducers: {
       }
     }
-  }]
+  }
+})
+
+```
+
+```
+
+const a_dva_mode = dvaodoo({
 })
 
 ```
@@ -41,51 +103,16 @@ const a_dva_mode = dvaodoo({
 * model: 对应 odoo 的模型名称
 * namespace: 必传参数 dva model 名称
 * service: 访问 odoo 服务的接口
-* extend: 自定义的 dva model 扩展部分, 注意中括号的作用
+* odooApi:  自定义的 api 扩展部分
+* dvaModel: 自定义的 dva model 扩展部分
 
 ## 两个特殊的模型
 
 dva-odoo 内置两个特别用途的模型, odooData 和 login, 
 生成模型时, 指定 inherit 参数即可 
 
+dva model 文件示例:
 
----
-
-
-```
-import odooServices from '@/services/odooservice'
-import dvaodoo from 'dva-odoo'
-
-const login_dva_mode = dvaodoo({
-  inherit: 'login',
-  service: odooServices.login,
-  extend: {
-      state:{
-      },
-      
-      effect:{
-      },
-      
-      reducers: {
-      }
-    }
-})
-
-const odooData_dva_mode = dvaodoo({
-  inherit: 'odooData',
-  service: odooServices.call,
-  extend: {
-      state:{
-      },
-      
-      effect:{
-      },
-      
-      reducers: {
-      }
-    }
-})
-```
 
 
 ---
@@ -136,6 +163,7 @@ dva-odoo 扩展包括两种情况,
 
 ## 开发日志:
 
+* 2018-10-6 dva-odoo 重构接口
 * 2018-9-27 应用项目的测试方案 ok
 * 2018-9-26 使用 dva 的开发环境, 搭建开发环境, npm 发布
 * 2018-9-25 odooApi 完成历史使命. 代码都集成到 metaModel 中

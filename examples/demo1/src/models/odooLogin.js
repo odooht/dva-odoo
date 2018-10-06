@@ -1,11 +1,9 @@
-import dvaOdoo from 'dva-odoo';
+//import dvaOdoo from 'dva-odoo';
 
-import services from '@/services/odooService'
+import dvaOdoo from '../../odoo/dva-odoo';
+import service from '@/services/odooService';
 
 export default dvaOdoo({
-  service: services.login,
-  inherit:'login',
-  extend : {}
-
-})
-
+  inherit: 'login',
+  service,
+});

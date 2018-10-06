@@ -4,7 +4,7 @@
     "start": "umi dev",
     "start:no-mock": "cross-env MOCK=none umi dev",
     "build": "umi build",
-    "test": "cross-env MOCK=true umi test",
+    "test": "umi test",
     "lint": "eslint --ext .js src mock tests",
     "precommit": "lint-staged"
   },
@@ -23,6 +23,8 @@
 
     "cross-env": "^5.1.1",
     "roadhog-api-doc": "^1.1.2",
+
+    "dva-model-extend": "^0.1.2",
     "dva-odoo": "^0.1.1",
     "dva-odoo-mock": "^0.1.0"
   },

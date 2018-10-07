@@ -14,16 +14,15 @@
 */
 
 import { delay } from 'roadhog-api-doc';
-import dvaOdooMock from './dva-odoo-mock';
+import dvaOdooMock from 'dva-odoo-mock';
+import dvaOdooMockCrm from 'dva-odoo-mock-crm';
+//import dvaOdooMock from './dva-odoo-mock';
+//import dvaOdooMockCrm from './dva-odoo-mock-crm';
 
 //TBD: dynamic import all file in mock path
-//import user from './user'
-//import game from './game'
 import contact from './contact';
 import login from './login';
 // 2018-9-18
-
-import dvaOdooMockCrm from './dva-odoo-mock-crm';
 
 const mockData = {
   contact: contact(),

@@ -1,12 +1,12 @@
 # dva-odoo 和 dva-odoo-mock
 
-包括 dva-odoo, dva-odoo-mock 
-以及 dva-odoo-crm, dva-odoo-mock-crm 演示如何扩展
+* 包括 dva-odoo, dva-odoo-mock 
+* 以及 dva-odoo-crm, dva-odoo-mock-crm 演示如何扩展
 
-dva-odoo 生成 dva model
-dva-odoo-mock 模拟数据接口
-dva-odoo-crm 扩展的 crm 模块
-dva-odoo-mock-crm 对 扩展 crm 模块的模拟数据
+* dva-odoo 生成 dva model
+* dva-odoo-mock 模拟数据接口
+* dva-odoo-crm 扩展的 crm 模块
+* dva-odoo-mock-crm 对 扩展 crm 模块的模拟数据
 
 # dva-odoo
 

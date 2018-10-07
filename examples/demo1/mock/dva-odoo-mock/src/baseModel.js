@@ -4,46 +4,16 @@ const my_records = {
   3: { id: 3, name: 'n3' },
 };
 
-/*
-const str2int = ids => {
-  const res = [];
-  for (var id of ids) {
-    res.push(parseInt(id));
-  }
-  return res;
-};
-*/
-
-export default ({ records: records0 }) => {
-  const records = records0 ? records0 : my_records;
-
+const apiCreator = records => {
   const read = (id, fields) => {
     if (typeof id === 'number') {
       return [records[id]];
     }
-    let res = [];
-    for (var ii of id) {
-      res.push(records[ii]);
-    }
-    return res;
+    return id.map(item => records[item]);
   };
 
   const search = (domain, kwargs) => {
     return Object.keys(records).map(item => parseInt(item));
-    //return str2int(ids);
-  };
-
-  const searchRead = (domain, fields) => {
-    const ids = search(domain);
-    return read(ids, fields);
-  };
-
-  const nameCreate = name => {
-    const ids1 = Object.keys(records).map(i => parseInt(i));
-    const ids = ids1.length ? ids1 : [0];
-    const id = Math.max(...ids) + 1;
-    records[id] = { id, name };
-    return [id, name];
   };
 
   const create = vals => {
@@ -69,13 +39,21 @@ export default ({ records: records0 }) => {
     }
   };
 
-  return {
-    search,
-    read,
-    searchRead,
-    nameCreate,
-    create,
-    write,
-    unlink,
+  const searchRead = (domain, fields) => {
+    const ids = search(domain);
+    return read(ids, fields);
   };
+
+  const nameCreate = name => {
+    const id = create({ name });
+    return [id, name];
+  };
+
+  return { search, read, create, write, unlink, searchRead, nameCreate };
+};
+
+export default ({ records: records0 }) => {
+  const records = records0 ? records0 : my_records;
+  const api = apiCreator(records);
+  return { ...api };
 };

@@ -23,7 +23,6 @@
 
     "cross-env": "^5.1.1",
     "roadhog-api-doc": "^1.1.2",
-
     "dva-model-extend": "^0.1.2",
     "dva-odoo": "^0.1.1",
     "dva-odoo-mock": "^0.1.0"

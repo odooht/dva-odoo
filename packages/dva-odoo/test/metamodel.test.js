@@ -1,28 +1,26 @@
 import dvaOdoo from '../src/index';
 import dvaOdooMock from '../../dva-odoo-mock/src/index';
-import dvaOdooGame from '../../dva-odoo-addons-igame/src/index';
+import dvaOdooCrm from '../../dva-odoo-crm/src/index';
+import dvaOdooMockCrm from '../../dva-odoo-mock-crm/src/index';
 
 import dva from 'dva';
 import { call, put, select } from 'redux-saga/effects';
 
 describe('dva-odoo', () => {
+  /*
+*/
   it('login ok', done => {
     test_login(done);
     done();
   });
 
-  it('search ok', done => {
+  it('searchRead ok', done => {
     test_search(done);
     done();
   });
 
-  it('searchRead ok', done => {
-    test_search_read(done);
-    done();
-  });
-
   it('view ok', done => {
-    test_search_read_view(done);
+    test_search_view(done);
     done();
   });
 
@@ -32,35 +30,40 @@ describe('dva-odoo', () => {
   });
 
   it('write ok', done => {
-    test_search_read_write(done);
+    test_search_write(done);
     done();
   });
 
   it('create ok', done => {
-    test_search_read_create(done);
+    test_search_create(done);
     done();
   });
   it('name create ok', done => {
-    test_search_read_name_create(done);
+    test_search_name_create(done);
     done();
   });
 
   it('unlink ok', done => {
-    test_search_read_unlink(done);
+    test_search_unlink(done);
     done();
   });
 
   it('findOrCreate ok', done => {
     // TBD find or create
     // TBD only find
-    test_search_read_findOrCreate(done);
+    test_search_findOrCreate(done);
+    done();
+  });
+
+  it('rename ok', done => {
+    test_search_rename(done);
     done();
   });
 });
 
 // mock folder
 const mockContact = () => {
-  return { inherit: 'res.partner' };
+  return { inherit: 'res.partner.contact' };
 };
 const mockLogin = () => {
   return {
@@ -87,6 +90,7 @@ const mockIndex = () => {
   const mockData = {
     contact,
     login,
+    inherits: { ...dvaOdooMockCrm },
   };
 
   const mockService = dvaOdooMock(mockData);
@@ -116,7 +120,7 @@ const getApp = () => {
   const app = dva();
 
   const model = dvaOdoo(
-    dvaOdooGame({
+    dvaOdooCrm({
       inherit: 'res.partner.contact',
       //model: 'res.partner',
       namespace: 'contact',
@@ -178,6 +182,7 @@ const test_login = done => {
 
 const test_search = done => {
   const app = getApp();
+
   app._store
     .dispatch({
       type: 'login/login',
@@ -187,40 +192,6 @@ const test_search = done => {
       app._store
         .dispatch({
           type: 'contact/search',
-          payload: { domain: [] },
-        })
-        .then(res => {
-          const state3 = app._store.getState();
-          console.log('3,search,', state3);
-          expect(state3.odooData).toEqual({
-            res_partner: {
-              1: { id: 1, name: 'n1' },
-              2: { id: 2, name: 'n2' },
-              3: { id: 3, name: 'n3' },
-            },
-          });
-
-          expect(state3.contact).toEqual({ ids: [1, 2, 3], id: 0 });
-        })
-        .catch(res => {
-          console.log('error', res);
-          done();
-        });
-    });
-};
-
-const test_search_read = done => {
-  const app = getApp();
-
-  app._store
-    .dispatch({
-      type: 'login/login',
-      payload: { login: 'admin', password: '123', type: 'account' },
-    })
-    .then(res => {
-      app._store
-        .dispatch({
-          type: 'contact/searchRead',
           payload: { domain: [] },
         })
         .then(res => {
@@ -242,7 +213,7 @@ const test_search_read = done => {
     });
 };
 
-const test_search_read_view = done => {
+const test_search_view = done => {
   const app = getApp();
 
   app._store
@@ -253,7 +224,7 @@ const test_search_read_view = done => {
     .then(res => {
       app._store
         .dispatch({
-          type: 'contact/searchRead',
+          type: 'contact/search',
           payload: { domain: [] },
         })
         .then(res => {
@@ -327,7 +298,7 @@ const test_read = done => {
     });
 };
 
-const test_search_read_write = done => {
+const test_search_write = done => {
   const app = getApp();
 
   app._store
@@ -338,7 +309,7 @@ const test_search_read_write = done => {
     .then(res => {
       app._store
         .dispatch({
-          type: 'contact/searchRead',
+          type: 'contact/search',
           payload: { domain: [] },
         })
         .then(res => {
@@ -383,7 +354,7 @@ const test_search_read_write = done => {
     });
 };
 
-const test_search_read_create = done => {
+const test_search_create = done => {
   const app = getApp();
 
   app._store
@@ -394,7 +365,7 @@ const test_search_read_create = done => {
     .then(res => {
       app._store
         .dispatch({
-          type: 'contact/searchRead',
+          type: 'contact/search',
           payload: { domain: [] },
         })
         .then(res => {
@@ -440,7 +411,7 @@ const test_search_read_create = done => {
     });
 };
 
-const test_search_read_name_create = done => {
+const test_search_name_create = done => {
   const app = getApp();
 
   app._store
@@ -451,7 +422,7 @@ const test_search_read_name_create = done => {
     .then(res => {
       app._store
         .dispatch({
-          type: 'contact/searchRead',
+          type: 'contact/search',
           payload: { domain: [] },
         })
         .then(res => {
@@ -502,7 +473,7 @@ const test_search_read_name_create = done => {
     });
 };
 
-const test_search_read_unlink = done => {
+const test_search_unlink = done => {
   const app = getApp();
 
   app._store
@@ -513,7 +484,7 @@ const test_search_read_unlink = done => {
     .then(res => {
       app._store
         .dispatch({
-          type: 'contact/searchRead',
+          type: 'contact/search',
           payload: { domain: [] },
         })
         .then(res => {
@@ -565,7 +536,7 @@ const test_search_read_unlink = done => {
     });
 };
 
-const test_search_read_findOrCreate = done => {
+const test_search_findOrCreate = done => {
   const app = getApp();
 
   const state0 = app._store.getState();
@@ -605,6 +576,56 @@ const test_search_read_findOrCreate = done => {
               expect(state7.contact).toEqual({
                 ids: [6, 1, 2, 3, 5],
                 id: 6,
+              });
+            })
+            .catch(res => {
+              console.log('error', res);
+              done();
+            });
+        });
+    });
+};
+
+const test_search_rename = done => {
+  const app = getApp();
+
+  const state0 = app._store.getState();
+  console.log('1 login,', state0);
+  expect(state0.login).toEqual({ sid: '', uid: 0 });
+
+  app._store
+    .dispatch({
+      type: 'login/login',
+      payload: { login: 'admin', password: '123', type: 'account' },
+    })
+    .then(res => {
+      app._store
+        .dispatch({
+          type: 'contact/search',
+          payload: { domain: [] },
+        })
+        .then(res => {
+          app._store
+            .dispatch({
+              type: 'contact/rename',
+              payload: { id: 2, name: 'n22' },
+            })
+            .then(res => {
+              const state7 = app._store.getState();
+              console.log('rename,', state7);
+              expect(state7.odooData).toEqual({
+                res_partner: {
+                  1: { id: 1, name: 'n1', email: 'win@odooht' },
+                  2: { id: 2, name: 'n22' },
+                  3: { id: 3, name: 'n3' },
+                  5: { id: 5, name: 'n198' },
+                  6: { id: 6, email: 'win@odooht' },
+                },
+              });
+
+              expect(state7.contact).toEqual({
+                ids: [1, 2, 3, 5, 6],
+                id: 0,
               });
             })
             .catch(res => {

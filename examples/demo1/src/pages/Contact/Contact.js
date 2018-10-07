@@ -83,7 +83,6 @@ class Bridge extends Component {
 
   findOrCreate = value => {
     const { dispatch } = this.props;
-    console.log('fc btn');
     dispatch({ type: ActionModel + '/findOrCreate', payload: { email: value } });
   };
 

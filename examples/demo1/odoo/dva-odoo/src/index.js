@@ -11,7 +11,7 @@ import modelCreators from './addons';
 
 const create_normal = ({ options, odooCall }) => {
   const getNewOptions = child => {
-    const { inherit = 'base' } = child;
+    const { inherit } = child;
     const creator = modelCreators[inherit];
     if (creator) {
       const parent = creator(child);
@@ -28,15 +28,15 @@ const create_normal = ({ options, odooCall }) => {
     fields,
     odooApi,
     dvaModel, // out model is a leaf model
-    apis: outApis = [],
-    extend: outExtend = [], // out model is with a parent
+    apis: outApis,
+    extend: outExtend, // out model is with a parent
   } = options;
 
   const { model, apis = [], extend = [] } = getNewOptions({
     inherit,
     model: odooModel,
-    apis: odooApi ? [...outApis, odooApi] : outApis,
-    extend: dvaModel ? [...outExtend, dvaModel] : outExtend,
+    apis: [...(outApis ? outApis : []), ...(odooApi ? [odooApi] : [])],
+    extend: [...(outExtend ? outExtend : []), ...(dvaModel ? [dvaModel] : [])],
   });
 
   let api = {};
@@ -53,7 +53,7 @@ const create_normal = ({ options, odooCall }) => {
 };
 
 export default options => {
-  const { inherit = 'base' } = options;
+  const { inherit } = options;
 
   if (inherit == 'odooData') {
     return odooDataCreate();

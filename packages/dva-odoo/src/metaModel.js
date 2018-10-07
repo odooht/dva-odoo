@@ -12,12 +12,7 @@
 
 import odooApi from './odooApi';
 
-const dvaModel = ({
-  model,
-  namespace,
-  api,
-  //  fields: default_fields = ['name'],
-}) => {
+const dvaModel = ({ model, namespace, api }) => {
   return {
     namespace,
     state: {
@@ -28,33 +23,9 @@ const dvaModel = ({
     effects: {
       *search({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.searchRead(token, {
-          model,
-          namespace,
-          ...payload,
-        });
-
+        const response = yield api.search(token, payload);
         const { result, error } = response;
 
-        if (result) {
-          yield put({
-            type: 'odooData/update',
-            payload: { model, data: result },
-          });
-          const ids = result.map(item => item.id);
-          yield put({ type: 'save', payload: { ids } });
-        }
-      },
-
-      *searchRead({ payload }, { call, put, select }) {
-        const token = yield select(state => state.login.sid);
-        const response = yield api.searchRead(token, {
-          model,
-          namespace,
-          ...payload,
-        });
-
-        const { result, error } = response;
         if (result) {
           yield put({
             type: 'odooData/update',
@@ -67,11 +38,7 @@ const dvaModel = ({
 
       *read({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.read(token, {
-          model,
-          namespace,
-          ...payload,
-        });
+        const response = yield api.read(token, payload);
         const { result, error } = response;
 
         if (result) {
@@ -86,12 +53,7 @@ const dvaModel = ({
 
       *write({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.write(token, {
-          model,
-          namespace,
-          ...payload,
-        });
-
+        const response = yield api.write(token, payload);
         const { result, error } = response;
 
         if (result) {
@@ -105,11 +67,7 @@ const dvaModel = ({
 
       *nameCreate({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.nameCreateRead(token, {
-          model,
-          namespace,
-          ...payload,
-        });
+        const response = yield api.nameCreate(token, payload);
 
         const { result, error } = response;
         if (result) {
@@ -123,12 +81,7 @@ const dvaModel = ({
 
       *create({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.createRead(token, {
-          ...payload,
-          model,
-          namespace,
-        });
-
+        const response = yield api.create(token, payload);
         const { result, error } = response;
 
         if (result) {
@@ -142,11 +95,7 @@ const dvaModel = ({
 
       *unlink({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.unlink(token, {
-          model,
-          namespace,
-          ...payload,
-        });
+        const response = yield api.unlink(token, payload);
 
         const { result, error } = response;
         if (result) {
@@ -173,7 +122,7 @@ const dvaModel = ({
       insert(state, { payload }) {
         const { ids } = state;
         const { id } = payload;
-        const nids = id in ids ? ids : [id, ...ids];
+        const nids = ids.indexOf(id) >= 0 ? ids : [id, ...ids];
         return { ...state, ids: nids, id };
       },
 

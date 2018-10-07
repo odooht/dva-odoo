@@ -1,7 +1,7 @@
 import service from '@/services/odooService';
 
 import dvaOdoo from '../../../../odoo/dva-odoo';
-import dvaOdooGame from '../../../../odoo/dva-odoo-addons-igame';
+import dvaOdooCrm from '../../../../odoo/dva-odoo-crm';
 
 const dvaModel = ({ namespace, model, api }) => {
   return {
@@ -12,7 +12,7 @@ const dvaModel = ({ namespace, model, api }) => {
         const token = yield select(state => state.login.sid);
         const { id, fields } = payload;
         const domain = [['id', '>=', id ? id : 0]];
-        const response = yield api.searchRead(token, {
+        const response = yield api.search(token, {
           model,
           namespace,
           domain,
@@ -45,6 +45,4 @@ const contact = {
   dvaModel,
 };
 
-const cc = dvaOdooGame(contact);
-
-export default dvaOdoo(cc);
+export default dvaOdoo(dvaOdooCrm(contact));

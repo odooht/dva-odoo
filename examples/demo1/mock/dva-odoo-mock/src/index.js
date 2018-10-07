@@ -3,24 +3,25 @@
 import modelCreators from './models';
 import baseModel from './baseModel';
 
-const getBaseOptions = (options = {}) => {
-  const { inherit = 'base' } = options;
-
-  if (inherit === 'base') {
-    return options;
-  }
-
-  const creator = modelCreators[inherit];
-
-  if (creator) {
-    const new_options = creator(options);
-    return getBaseOptions(new_options);
-  }
-
-  return options;
-};
-
 const mockServicesCreator = mockData => {
+  const { inherits = {} } = mockData;
+
+  const getBaseOptions = (options = {}) => {
+    const { inherit = 'base' } = options;
+    if (inherit === 'base') {
+      return options;
+    }
+
+    const creator = { ...modelCreators, ...inherits }[inherit];
+
+    if (creator) {
+      const new_options = creator(options);
+      return getBaseOptions(new_options);
+    }
+
+    return options;
+  };
+
   const call2 = req => {
     const params = unpack(req);
     const { args, kwargs } = params;

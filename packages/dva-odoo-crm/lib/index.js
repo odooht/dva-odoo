@@ -11,21 +11,15 @@ var _objectSpread2 = _interopRequireDefault(
   require('@babel/runtime/helpers/objectSpread')
 );
 
-var _addons = _interopRequireDefault(require('./addons'));
+var _vob_res = _interopRequireDefault(require('./vob_res'));
+
+// TBD: Mix all models in each addons
+var allCreators = (0, _objectSpread2.default)({}, _vob_res.default);
 
 var _default = function _default(options) {
-  var _options$inherit = options.inherit,
-    inherit = _options$inherit === void 0 ? 'base' : _options$inherit,
-    extend = options.extend;
-  var create = _addons.default[inherit];
-
-  if (!create) {
-    return (0, _objectSpread2.default)({}, options, {
-      inherit: inherit,
-    });
-  }
-
-  return create(options);
+  var inherit = options.inherit;
+  var creator = allCreators[inherit];
+  return creator ? creator(options) : options;
 };
 
 exports.default = _default;

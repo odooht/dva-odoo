@@ -7,9 +7,9 @@ Object.defineProperty(exports, '__esModule', {
 });
 exports.default = void 0;
 
-var _og = _interopRequireDefault(require('./og.igame'));
+var _resPartnerContact = _interopRequireDefault(require('./resPartnerContact'));
 
 var _default = {
-  'og.igame': _og.default,
+  'res.partner.contact': _resPartnerContact.default,
 };
 exports.default = _default;

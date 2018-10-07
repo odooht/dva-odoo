@@ -45,4 +45,10 @@ const contact = {
   dvaModel,
 };
 
+const sss = dvaOdooCrm(contact);
+console.log(sss);
+
+const sss3 = dvaOdoo(dvaOdooCrm(contact));
+console.log(sss3);
+
 export default dvaOdoo(dvaOdooCrm(contact));

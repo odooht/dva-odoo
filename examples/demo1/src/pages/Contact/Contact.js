@@ -90,7 +90,8 @@ class Bridge extends Component {
     const name = value;
     const { id } = this.props[ActionModel];
     const { dispatch } = this.props;
-    dispatch({ type: ActionModel + '/write', payload: { id, vals: { name } } });
+    dispatch({ type: ActionModel + '/rename', payload: { id, name } });
+    //dispatch({ type: ActionModel + '/write', payload: { id, vals: { name } } });
   };
 
   del = value => {

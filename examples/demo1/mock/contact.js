@@ -40,7 +40,7 @@ const creator = ({ records }) => {
 export default () => {
   return {
     records: my_records,
-    inherit: 'res.partner',
+    inherit: 'res.partner.contact',
     extend: [creator],
   };
 };

@@ -1,27 +1,125 @@
+# dva-odoo
 
+version: 0.2.0
 
-## 测试
-* 测试 metaModel 需要自己定义一个 service, 并通过 mock 参数传递模拟信息
-* 测试 odooData 需要自己定义一个 service, 并通过 mock 参数传递模拟信息
+基于 dva 的一个模块, 定义一些访问 odoo 的接口
+
+包括 dva-odoo 和 dva-odoo-mock
+
+# 使用方法
 
 ---
+在 services 文件夹下建立文件 service.js
+其中 '@/utils/request' 是一个 基于 fetch 的异步 web 请求模块
+可以从 ant-design-pro 上下载
+未来计划将 request 集成到 dva-odoo 中
 
-## 开发日志:
+```
+import request from '@/utils/request';
 
-* 2018-10-6 dva-odoo 重构接口
-* 2018-9-27 应用项目的测试方案 ok
-* 2018-9-26 使用 dva 的开发环境, 搭建开发环境, npm 发布
-* 2018-9-25 odooApi 完成历史使命. 代码都集成到 metaModel 中
-* 2018-9-24 测试 ok. odooData 测试完成, 仅有 sid 为空时的分支未测到.
-* 2018-9-23 定义 dva-odoo 扩展方法, 建议命名格式为 dva-odoo-addons-xxx
-* 2018-9-23 优化模型构造方法, 解耦 dva-odoo 和 dva-odoo-addons
-* 2018-9-23 基本模型中增加通用的 call 方法. res.partner.contact 中的rename 演示 call 方法的使用
-* 2018-9-23 model 无需通过回调实现控制, 可以通过扩展模型方法来搞定
-* 2018-9-22 逐步规范代码, 便于在 npm 发布
-* 2018-9-20 model 设置回调函数, 便于页面控制. 完成 login 模型的回调函数.
-* 2018-9-18 定义 dva-odoo-core, 拆分出 dva-odoo-addons
-* 2018-9-17 remove odoorpc from dva-odoo. 这样 dva-odoo 去 odoo 化, 纯粹成为 dva 的扩展. 
-* 2018-9-16 设置模型扩展机制. 包括 dva model 和 mock model
-* 2018-9-16 明确对外接口, modelCreator, rpcCall, mockModel, mockApi
-* 2018-9-15 将 sid 从 odooApi 移出, 放在 model 中.  
-* 2018-9-15 在 umi-odoo-demo 中, 整理 dva-odoo 有关代码, 准备独立.
+export default {
+  call: { url: '/api/json/api', request },
+  login: { url: '/api/json/user/login', db: 'TT' },
+};
+```
+---
+在 models 文件夹下建立 odooData.js
+```
+import dvaOdoo from 'dva-odoo'
+export default dvaOdoo({
+  inherit: 'odooData'
+})
+
+```
+
+在 models 文件夹下建立 login.js
+```
+import dvaOdoo from 'dva-odoo'
+import service from '@services/service'
+export default dvaOdoo({
+  inherit: 'login',
+  service,
+  extned:{
+    effects:{
+      *newMethod(){}
+    }
+  }
+})
+
+```
+
+创建一个新 model:
+
+```
+import service from '@services/service'
+import dvaOdoo from 'dva-odoo'
+
+const odooApi = (options)=> {
+  const { model, namespace, fields:fields_default=['name'], odooCall, api } = options
+  const foo = async (token, params) =>{
+    const res1 = await odooCall(token,params: {model, method, args, kwargs})
+    const res2 = await api.read(token,params: {id, fields})
+    return ...
+  }
+  
+  const bar = async (token, params) =>{
+    /* !!! to connect to dva-odoo-mock */
+    const mock_react_api = namespace + '/' + 'bar'
+    
+    const res1 = await foo(token,params: {...})
+    const res2 = await odooCall(token,params: {
+      model, method, args, 
+      kwargs:{context: mock_react_api}
+    })
+    
+    const res3 = await api.read(token,params: {id, fields})
+    return ...
+  }
+  return {
+    foo, bar
+  }
+}
+
+
+const dvaModel = ({namespace, model, api }) => {
+  return {
+    namespace: namespace,
+    state:{
+    },
+      
+    effect:{
+      *bar: (){
+        const response = yield api.bar()
+      }
+      const {result, error} = response
+      if(result){
+        yield put(type:'save', payload: {data: result})
+      }
+    },
+      
+    reducers: {
+    }
+  }
+}
+
+
+export default dvaOdoo({
+  inherit: 'res.partner',
+  namespace: 'contact',
+  model: 'res.partner',
+  service,
+  odooApi,
+  dvaModel,
+})
+
+```
+
+各参数的作用:
+* inherit: 被继承的模版名称
+* model: 对应 odoo 的模型名称, 如果 inherit == 'base', 为必传
+* namespace: 必传参数 dva model 名称
+* service: 访问 odoo 服务的接口
+* odooApi:  自定义的 api 扩展部分
+* dvaModel: 自定义的 dva model 扩展部分
+
+

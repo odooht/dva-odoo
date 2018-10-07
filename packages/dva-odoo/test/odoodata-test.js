@@ -20,7 +20,7 @@ const create_odoodata = done => {
     },
   });
 
-  console.log(model);
+  //console.log(model);
 
   expect(model.namespace).toEqual('odooData');
   expect(model.state).toEqual({});

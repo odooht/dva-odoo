@@ -1,7 +1,7 @@
 {
-  "name": "dva-odoo",
+  "name": "dva-odoo-mock-crm",
   "version": "0.2.0",
-  "description": "A creator of dva model for odoo.",
+  "description": "A mock for dva-odoo-crm.",
   "repository": {
     "type": "git",
     "url": "https://github.com/odooht/dva-odoo"
@@ -9,7 +9,9 @@
   "homepage": "https://github.com/odooht/dva-odoo",
   "keywords": [
     "dva",
-    "odoo"
+    "odoo",
+    "mock",
+    "crm"
   ],
   "author": "odooHT <odooht@163.com>",
   "license": "MIT",
@@ -24,7 +26,6 @@
     "src"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.0.0",
-    "dva-model-extend": "*"
+    "@babel/runtime": "^7.0.0"
   }
 }

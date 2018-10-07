@@ -14,30 +14,25 @@
 */
 
 import { delay } from 'roadhog-api-doc';
-
-import dvaOdoo from 'dva-odoo-mock'
-
-import loginModel from './loginModel';
+import dvaOdooMock from 'dva-odoo-mock';
+import dvaOdooMockCrm from 'dva-odoo-mock-crm';
+//import dvaOdooMock from './dva-odoo-mock';
+//import dvaOdooMockCrm from './dva-odoo-mock-crm';
 
 //TBD: dynamic import all file in mock path
-import contact from './contact'
-//TBD: 2018-9-18
+import contact from './contact';
+import login from './login';
+// 2018-9-18
 
-const proxy = {
-  'POST /api/json/api': (req, res) => {
-    const result = dvaOdoo.mockApi.jsonApi( req.body, {
-      contact,
-    });
-
-    res.send( result );
-  },
-
-  'POST /api/json/user/login': (req, res) => {
-    const result = dvaOdoo.mockApi.jsonUserLogin( req.body, loginModel.records);
-    res.send( result );
-  },
+const mockData = {
+  contact: contact(),
+  login: login(),
+  inherits: { ...dvaOdooMockCrm },
 };
 
-//export default proxy;
+const proxy = {
+  'POST /api/json/api': dvaOdooMock(mockData).call,
+  'POST /api/json/user/login': dvaOdooMock(mockData).login,
+};
 
 export default delay(proxy, 200);

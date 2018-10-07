@@ -1,7 +1,10 @@
-
 export function lookup(ids = [], data = {}) {
   /* get recordset by id or ids  */
-  return Array.isArray(ids) ? ids.map(id => data[id]) : data[ids] ? data[ids] : {}
+  return Array.isArray(ids)
+    ? ids.map(id => data[id]).filter(item => item)
+    : data[ids]
+      ? data[ids]
+      : {};
 }
 
 export function toArray(field, operator, value) {
@@ -14,23 +17,20 @@ export function toArray(field, operator, value) {
   return [field, operator, value];
 }
 
-
 export function get_ids(id, partners) {
-    const ids = [];
-    for (var index in partners) {
-        /* user-defined */
-        if (index > id) {
-            ids.push(parseInt(index))
-        }
-    };
-    return ids;
+  const ids = [];
+  for (var index in partners) {
+    /* user-defined */
+    if (index > id) {
+      ids.push(parseInt(index));
+    }
+  }
+  return ids;
 }
 
 export function get_newId(partners) {
-    const ids = Object.keys(partners);
-    const newids = [0, ...ids];
-    const id = Math.max(...newids) + 1;
-    return id;
+  const ids = Object.keys(partners);
+  const newids = [0, ...ids];
+  const id = Math.max(...newids) + 1;
+  return id;
 }
-
-

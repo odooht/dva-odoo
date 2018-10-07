@@ -1,80 +1,79 @@
-import modelExtend from 'dva-model-extend';
-
-const getCallAction = options => {
-  const { method, args, kwargs = {}, mock, callback, params } = options;
+const dvaModel = ({ namespace, model, api }) => {
   return {
-    type: 'call',
-    payload: {
-      params: {
-        method,
-        args,
-        kwargs,
-        mock,
-      },
-      callback: {
-        type: callback ? callback : method + '_callback',
-        params,
+    namespace,
+    state: {},
+    effects: {
+      *findOrCreate({ payload }, { call, put, select }) {
+        const token = yield select(state => state.login.sid);
+        const response = yield api.findOrCreate(token, payload);
+        const { result, error } = response;
+        if (result) {
+          yield put({
+            type: 'odooData/update',
+            payload: { model, data: result },
+          });
+          yield put({ type: 'insert', payload: { id: result[0].id } });
+        }
       },
     },
+    reducers: {},
   };
 };
 
-export default options => {
-  console.log('res.partner:', options);
-  const model = 'res.partner';
+const odooApi = options => {
+  const {
+    model,
+    namespace,
+    fields: default_fields = ['name'],
+    odooCall,
+    api,
+  } = options;
 
-  const createself = options => {
-    const {
+  const _findOrCreate = async (token, params) => {
+    const { email, context = {} } = params;
+    const { mock = 'findOrCreate' } = context;
+    const mock_react_api = namespace + '/' + mock;
+    const method = 'find_or_create';
+    const response = await odooCall(token, {
       model,
-      namespace,
-      service,
-      fields: default_fields = ['name'],
-    } = options;
-    return {
-      namespace: namespace,
+      method,
+      args: [email],
+      kwargs: { context: { ...context, mock_react_api } },
+    });
 
-      state: {},
-
-      effects: {
-        *findOrCreate({ payload }, { call, put, select }) {
-          const {
-            fields = default_fields,
-            email,
-            mock = 'findOrCreate',
-          } = payload;
-          yield put(
-            getCallAction({
-              method: 'find_or_create',
-              args: [email],
-              mock,
-              callback: 'findOrCreate_callback',
-              params: payload,
-            })
-          );
-        },
-
-        *findOrCreate_callback({ payload }, { call, put, select }) {
-          const {
-            params: { fields },
-            response: { result },
-          } = payload;
-          if (result) {
-            yield put({ type: 'read', payload: { id: result, fields } });
-            yield put({ type: 'insert', payload: { id: result } });
-          }
-        },
-      },
-
-      reducers: {},
-    };
+    const { result, error } = response;
+    return { result, error };
   };
 
-  const { extend = [] } = options;
+  const findOrCreate = async (token, params) => {
+    const response = await _findOrCreate(token, params);
+    const { result: result0, error: error0 } = response;
+
+    if (result0) {
+      const { fields = default_fields } = params;
+      const response2 = await api.read(token, {
+        id: result0,
+        fields,
+      });
+      const { result, error } = response2;
+      return { result, error };
+    }
+    return { result: result0, error: error0 };
+  };
 
   return {
-    ...options,
-    model,
+    findOrCreate,
+  };
+};
+
+export default child => {
+  const { apis = [], extend = [] } = child;
+
+  return {
+    ...child,
+    model: 'res.partner',
     inherit: 'base',
-    extend: [createself, ...extend],
+    apis: [odooApi, ...apis],
+    extend: [dvaModel, ...extend],
   };
 };

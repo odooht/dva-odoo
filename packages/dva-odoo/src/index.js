@@ -2,66 +2,76 @@ import modelExtend from 'dva-model-extend';
 
 import odooDataCreate from './odooData';
 import loginCreate from './login';
-import metaModelCreate from './metaModel';
 
+import odooApi from './odooApi';
+import ServiceCreator from './odooService';
+
+import metaModelCreate from './metaModel';
 import modelCreators from './addons';
 
-const getBaseOptions = options => {
-  const { inherit = 'base' } = options;
+const create_normal = ({ options, odooCall }) => {
+  const getNewOptions = child => {
+    const { inherit } = child;
+    const creator = modelCreators[inherit];
+    if (creator) {
+      const parent = creator(child);
+      return getNewOptions(parent);
+    } else {
+      return metaModelCreate(child);
+    }
+  };
 
-  if (inherit === 'base') {
-    return options;
+  const {
+    inherit,
+    model: odooModel,
+    namespace,
+    fields,
+    odooApi,
+    dvaModel, // out model is a leaf model
+    apis: outApis,
+    extend: outExtend, // out model is with a parent
+  } = options;
+
+  const { model, apis = [], extend = [] } = getNewOptions({
+    inherit,
+    model: odooModel,
+    apis: [...(outApis ? outApis : []), ...(odooApi ? [odooApi] : [])],
+    extend: [...(outExtend ? outExtend : []), ...(dvaModel ? [dvaModel] : [])],
+  });
+
+  let api = {};
+  for (const apiCreators of apis) {
+    const ppp = apiCreators({ model, namespace, fields, odooCall, api });
+    api = { ...api, ...ppp };
   }
 
-  const creator = modelCreators[inherit];
-
-  if (creator) {
-    const new_options = creator(options);
-    return getBaseOptions(new_options);
+  let outModel = {};
+  for (const dvaModelCreators of extend) {
+    outModel = modelExtend(
+      outModel,
+      dvaModelCreators({ model, namespace, api })
+    );
   }
-
-  return options;
-};
-
-const create_odooData = options => {
-  const { service } = options;
-  return odooDataCreate({ service });
-};
-
-const create_login = options => {
-  const { service, extend = {} } = options;
-
-  //  const dvamodel = loginCreate({ service });
-  const dvamodel = loginCreate(options);
-
-//  console.log(dvamodel);
-
-  const { namespace } = dvamodel;
-
-  return modelExtend(dvamodel, { ...extend, namespace });
+  return outModel;
 };
 
 export default options => {
-  const { inherit = 'base' } = options;
+  const { inherit } = options;
 
   if (inherit == 'odooData') {
-    return create_odooData(options);
+    return odooDataCreate();
   }
+
+  const { service } = options;
+  const odooService = ServiceCreator(service);
 
   if (inherit == 'login') {
-    return create_login(options);
+    const dvamodel = loginCreate(odooService.login);
+    const { namespace } = dvamodel;
+    const { extend = {} } = options;
+    return modelExtend(dvamodel, { ...extend, namespace });
   }
 
-  const new_options = getBaseOptions(options);
-
-  const srcModel = metaModelCreate(new_options);
-
-  const { extend = [] } = new_options;
-
-  let outModel = srcModel;
-  for (var ext of extend) {
-    outModel = modelExtend(outModel, ext(options));
-  }
-
-  return outModel;
+  const api = odooApi(odooService.call);
+  return create_normal({ options, odooCall: odooService.call });
 };

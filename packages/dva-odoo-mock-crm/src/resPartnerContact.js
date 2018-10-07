@@ -7,15 +7,16 @@ const my_records = {
 };
 
 const partner = ({ records }) => {
-  const findOrCreate = email => {
-    const ids = Object.keys(records);
-    const id = Math.max(...ids) + 1;
-    records[id] = { id, email };
-    return id;
+  const rename = (id, name) => {
+    if (Object.keys(records).indexOf(id)) {
+      records[id] = { ...records[id], name };
+      return 1;
+    }
+    return 0;
   };
 
   return {
-    findOrCreate,
+    rename,
   };
 };
 
@@ -23,7 +24,7 @@ export default options => {
   const { records, extend = [] } = options;
   return {
     records: records ? records : my_records,
-    inherit: 'base',
+    inherit: 'res.partner',
     extend: [partner, ...extend],
   };
 };

@@ -66,7 +66,7 @@ export default options => {
   const odooService = ServiceCreator(service);
 
   if (inherit == 'login') {
-    const dvamodel = loginCreate(odooService.login);
+    const dvamodel = loginCreate(odooService);
     const { namespace } = dvamodel;
     const { extend = {} } = options;
     return modelExtend(dvamodel, { ...extend, namespace });

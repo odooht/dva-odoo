@@ -1,3 +1,15 @@
+const jsonrpc = params => {
+  return {
+    method: 'POST',
+    body: {
+      jsonrpc: 2.0,
+      id: 1,
+      method: 'call',
+      params: params,
+    },
+  };
+};
+
 export default service => {
   const {
     call: { proxy, request },
@@ -35,17 +47,8 @@ export default service => {
   const req = proxy ? mockRequest : request;
 
   const login = async params => {
-    // TBD jsonrpc  move here
-
     const { url, db } = service.login;
-    const { body } = params;
-    const { params: params2 } = body;
-    const new_params = {
-      ...params,
-      body: { ...body, params: { ...params2, db } },
-    };
-
-    return await req(url, new_params);
+    return await req(url, jsonrpc({ ...params, db }));
   };
 
   const call = async (token, params) => {
@@ -54,15 +57,8 @@ export default service => {
     const { url: url0 } = service.call;
     const now = Date.now();
     const url = `${url0}?session_id=${token}&_now=${now}`;
-    return req(url, {
-      method: 'POST',
-      body: {
-        jsonrpc: 2.0,
-        id: 1,
-        method: 'call',
-        params,
-      },
-    });
+
+    return req(url, jsonrpc(params));
   };
 
   return {

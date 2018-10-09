@@ -121,6 +121,12 @@ dva-odoo 扩展包括两种情况,
 定义 model 时, 设定 fields
 read 时, many2one 字段, 返回值是 [id, name] 格式
 read 时, many2many 和 one2many 字段, 返回值是 [id1,id2,...]
+
+模型定义时, fields 中给出缺省查询时有哪些字段
+另外增加一个参数, fields-define 中给出 字段定义, 主要是 数据类型
+
+在 search 方法中, 根据
+
 metaModel 的 reducers 方法需要check重构
 put odooData/update 不易于理解
 重新定义几个 effect 处理 odooData/update

@@ -17,7 +17,7 @@ export default odooService => {
     },
 
     effects: {
-      *login({ payload, callback, success, error }, { call, put, select }) {
+      *login({ payload }, { call, put, select }) {
         const response = yield odooService.login(payload);
         const { result, error: errormsg } = response;
         const data = result;
@@ -28,7 +28,7 @@ export default odooService => {
           const { uid: id } = data;
         } else {
           // ? how to update state?
-          // console.log(11)
+           console.log('11',response)
         }
       },
     },

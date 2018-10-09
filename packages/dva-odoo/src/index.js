@@ -25,7 +25,7 @@ const create_normal = ({ options, odooCall }) => {
     inherit,
     model: odooModel,
     namespace,
-    fields,
+    fields,  // default fields and fields defination
     odooApi,
     dvaModel, // out model is a leaf model
     apis: outApis,
@@ -38,7 +38,7 @@ const create_normal = ({ options, odooCall }) => {
     apis: [...(outApis ? outApis : []), ...(odooApi ? [odooApi] : [])],
     extend: [...(outExtend ? outExtend : []), ...(dvaModel ? [dvaModel] : [])],
   });
-
+  
   let api = {};
   for (const apiCreators of apis) {
     const ppp = apiCreators({ model, namespace, fields, odooCall, api });
@@ -49,7 +49,7 @@ const create_normal = ({ options, odooCall }) => {
   for (const dvaModelCreators of extend) {
     outModel = modelExtend(
       outModel,
-      dvaModelCreators({ model, namespace, api })
+      dvaModelCreators({ model, namespace, fields, odooCall, api })
     );
   }
   return outModel;
@@ -72,6 +72,6 @@ export default options => {
     return modelExtend(dvamodel, { ...extend, namespace });
   }
 
-  const api = odooApi(odooService.call);
+  //const api = odooApi(odooService.call);
   return create_normal({ options, odooCall: odooService.call });
 };

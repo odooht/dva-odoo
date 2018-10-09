@@ -22,12 +22,8 @@ const dvaModel = ({ namespace, model, api }) => {
 
 const odooApi = options => {
   const {
-    model,
-    namespace,
-    fields: default_fields = ['name'],
-    odooCall,
-    api,
-  } = options;
+    model, namespace, fields:{ default: default_fields = ['name'] }, odooCall, api 
+  } = options
 
   const _findOrCreate = async (token, params) => {
     const { email, context = {} } = params;

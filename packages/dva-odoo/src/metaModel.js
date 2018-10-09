@@ -12,7 +12,23 @@
 
 import odooApi from './odooApi';
 
-const dvaModel = ({ model, namespace, api }) => {
+const dvaModel = ({ model, namespace, fields, odooCall, api }) => {
+  
+  /*
+    env = {
+      field1:  odooApi(options1)
+      field2:  odooApi(options2)
+    }
+
+    many2one,
+    one2many,
+    many2many,
+many2one, one2many, many2many,
+  
+  */
+  
+//  console.log('dva model,',fields)
+  
   return {
     namespace,
     state: {
@@ -93,10 +109,11 @@ const dvaModel = ({ model, namespace, api }) => {
         }
       },
 
+
       *unlink({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
+        
         const response = yield api.unlink(token, payload);
-
         const { result, error } = response;
         if (result) {
           const { id } = payload;

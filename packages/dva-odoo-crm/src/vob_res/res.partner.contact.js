@@ -22,12 +22,10 @@ const dvaModel = ({ namespace, model, api }) => {
 
 const odooApi = options => {
   const {
-    model,
-    namespace,
-    fields: default_fields = ['name'],
-    odooCall,
-    api,
-  } = options;
+    model, namespace, fields:{ default: default_fields = ['name'] }, odooCall, api 
+  } = options
+
+  
   const searchRead = async (token, params) => {
     const { domain = [] } = params;
     const dm1 = [['type', '=', 'contact']];

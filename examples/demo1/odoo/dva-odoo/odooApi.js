@@ -10,6 +10,9 @@ const refCreator = (options) => {
     const {id, fields = default_fields} = params
     const method = 'read';
     
+    
+    //console.log( model, namespace )
+    
     const response = await odooCall(token, {
       model, method, 
       args: [id, fields],
@@ -21,6 +24,8 @@ const refCreator = (options) => {
   
   return read
 }
+
+
 
 const apiCreator = (options) => {
   const {
@@ -37,45 +42,6 @@ const apiCreator = (options) => {
   let reference = {}
   for(const fld in refs ){
     reference[fld] = refCreator( { ...refs[fld], odooCall } )
-  }
-
-  const ref_read = async (token, fields, data) => {
-    let ref_res = {}
-    
-    for (const fld of fields){
-      const reference_read = reference[fld]
-      
-      const one2many_ids = (data) => {
-        const ids0 = data.map( item=> item[fld] ? item[fld] : [])
-        const ids1 = [].concat.apply([], ids0 )
-        return Array.from(new Set(ids1))
-      }
-      
-      const many2one_ids = (data) => {
-        const ids0 = data.map( item=> item[fld] ? item[fld][0] : null)
-        const ids1 = ids0.filter( item => item != null)
-        return Array.from(new Set(ids1))
-      }
-      
-      const ref_model = ( fld in one2many ) ? one2many[fld].model
-                      : ( fld in many2one ) ? many2one[fld].model
-                      : null
-      
-      const ref_ids = ( fld in one2many ) ? one2many_ids(data)
-                    : ( fld in many2one ) ? many2one_ids(data)
-                    : []
-      
-      if(ref_ids.length){
-        const rrr = await reference_read( token ,{ id:ref_ids })
-        const {result} = rrr
-        if(result){
-            ref_res[ref_model]= result 
-        }
-      }
-    }
-    
-    return ref_res
-    
   }
 
   const getContext = (payload, mock_default) => {
@@ -95,11 +61,6 @@ const apiCreator = (options) => {
       kwargs: { context },
     });
     const { result, error } = response;
-    if(result){
-        const ref_res = await ref_read(token, fields, result)
-        const result2 = {...ref_res, [model]:result}
-        return {result: result2, error}
-    }
     return { result, error };
   };
 
@@ -113,12 +74,6 @@ const apiCreator = (options) => {
       kwargs: { context },
     });
     const { result, error } = response;
-    
-    if(result){
-        const ref_res = await ref_read(token, fields, result)
-        const result2 = {...ref_res, [model]:result}
-        return {result: result2, error}
-    }
     return { result, error };
   };
 

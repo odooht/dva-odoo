@@ -6,10 +6,10 @@
 */
 
 const my_records = {
-  1: { id: 1, name: 'c1', email: '' },
-  2: { id: 2, name: 'c2', email: '' },
-  3: { id: 3, name: 'c3', email: '' },
-  4: { id: 4, name: 'c4', email: '' },
+  1: { id: 1, name: 'c1', email: '', title:[1,'t1'], cetogory_id: [1,2] },
+  2: { id: 2, name: 'c2', email: '', title:[2,'t1'], cetogory_id: [1,2] },
+  3: { id: 3, name: 'c3', email: '', title:[3,'t1'], cetogory_id: [2,3] },
+  4: { id: 4, name: 'c4', email: '', title:[1,'t1'], cetogory_id: [3] },
 };
 
 const str2int = ids => {

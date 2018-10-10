@@ -15,6 +15,8 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
 var dvaModel = function dvaModel(_ref) {
   var namespace = _ref.namespace,
       model = _ref.model,
@@ -56,13 +58,10 @@ var dvaModel = function dvaModel(_ref) {
                 _context.next = 13;
                 return put({
                   type: 'odooData/update',
-                  payload: {
-                    model: model,
-                    data: [{
-                      id: id,
-                      name: name
-                    }]
-                  }
+                  payload: (0, _defineProperty2.default)({}, model, [{
+                    name: name,
+                    id: id
+                  }])
                 });
 
               case 13:
@@ -85,7 +84,7 @@ var odooApi = function odooApi(options) {
       odooCall = options.odooCall,
       api = options.api;
 
-  var searchRead =
+  var search =
   /*#__PURE__*/
   function () {
     var _ref4 = (0, _asyncToGenerator2.default)(
@@ -99,7 +98,7 @@ var odooApi = function odooApi(options) {
             case 0:
               _params$domain = params.domain, domain = _params$domain === void 0 ? [] : _params$domain;
               dm1 = [['type', '=', 'contact']];
-              return _context2.abrupt("return", api.searchRead(token, (0, _objectSpread2.default)({}, params, {
+              return _context2.abrupt("return", api.search(token, (0, _objectSpread2.default)({}, params, {
                 domain: (0, _toConsumableArray2.default)(domain).concat(dm1)
               })));
 
@@ -111,7 +110,7 @@ var odooApi = function odooApi(options) {
       }, _callee, this);
     }));
 
-    return function searchRead(_x, _x2) {
+    return function search(_x, _x2) {
       return _ref4.apply(this, arguments);
     };
   }();
@@ -160,53 +159,24 @@ var odooApi = function odooApi(options) {
       return _ref5.apply(this, arguments);
     };
   }();
-
-  var rename2 =
-  /*#__PURE__*/
-  function () {
-    var _ref6 = (0, _asyncToGenerator2.default)(
-    /*#__PURE__*/
-    _regenerator.default.mark(function _callee3(token, params) {
-      var id, name, response, result, error;
-      return _regenerator.default.wrap(function _callee3$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              id = params.id, name = params.name;
-              _context4.next = 3;
-              return api.write(token, {
-                model: model,
-                id: id,
-                vals: {
-                  name: name
-                } // context: {mock:'rename'}
-
-              });
-
-            case 3:
-              response = _context4.sent;
-              result = response.result, error = response.error;
-              return _context4.abrupt("return", {
-                result: result,
-                error: error
-              });
-
-            case 6:
-            case "end":
-              return _context4.stop();
-          }
-        }
-      }, _callee3, this);
-    }));
-
-    return function rename2(_x5, _x6) {
-      return _ref6.apply(this, arguments);
+  /*
+    const rename2 = async (token, params) => {
+      const { id, name } = params;
+      const response = await api.write(token, {
+        model,
+        id,
+        vals: { name },
+        // context: {mock:'rename'}
+      });
+      const { result, error } = response;
+      return { result, error };
     };
-  }();
+  */
+
 
   return {
     rename: rename,
-    searchRead: searchRead
+    search: search
   };
 };
 

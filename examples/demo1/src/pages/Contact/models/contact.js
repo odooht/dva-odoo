@@ -1,10 +1,10 @@
 import service from '@/services/odooService';
 
-//import dvaOdoo from '../../../../odoo/dva-odoo';
-//import dvaOdooCrm from '../../../../odoo/dva-odoo-crm';
+import dvaOdoo from '../../../../odoo/dva-odoo';
+import dvaOdooCrm from '../../../../odoo/dva-odoo-crm';
 
-import dvaOdoo from 'dva-odoo';
-import dvaOdooCrm from 'dva-odoo-crm';
+//import dvaOdoo from 'dva-odoo';
+//import dvaOdooCrm from 'dva-odoo-crm';
 
 const dvaModel = ({ namespace, model, api }) => {
   return {
@@ -37,14 +37,52 @@ const dvaModel = ({ namespace, model, api }) => {
   };
 };
 
+const fields = {
+    default: [
+        'name', 'comment',
+        'color', 'credit_limit',
+        'date', 'image',
+        'customer',
+        'type',
+        'title',
+        'child_ids',
+        'category_id',
+    ],
+    many2one: {
+        title:{
+          model:'res.partner.title',
+          namespace:'res.partner.title',
+          fields:{default:['name']},
+          domain: []
+        },
+
+    },
+
+    one2many: {
+        child_ids: {
+          model: 'res.partner',
+          namespace:'contact',
+          fields:{default:['name']},
+          domain: [],
+        },
+
+        category_id:{
+          model:'res.partner.category',
+          namespace:'res.partner.category',
+          fields:{default:['name']},
+          domain: [],
+        }
+    },
+
+}
+
+
 const contact = {
   model: 'res.partner',
   namespace: 'contact',
-  //   inherit:   'base',
-  //   inherit:   'res.partner',
   inherit: 'res.partner.contact',
   service,
-  fields: ['name', 'email'],
+  fields,
   dvaModel,
 };
 

@@ -222,6 +222,7 @@ const test_search = async () => {
     }
   }
   
+  
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
@@ -268,7 +269,7 @@ const test_read = async () => {
     type: 'contact/read',
     payload: { id: 2 },
   })
-
+  
   const result = {
       login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
       contact: { ids: [], id: 0 },
@@ -499,6 +500,7 @@ const test_search_findOrCreate = async () => {
   
 
 }
+
 const test_search_rename = async () => {
   const state = await test({
     type: 'contact/rename',

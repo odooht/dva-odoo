@@ -1,3 +1,11 @@
+/*
+*/
+
+function dot2line(model) {
+  return model
+  //return model.replace('.', '_');
+  
+}
 
 const list2dict = result => {
   if (result) {
@@ -22,14 +30,10 @@ export default () => {
 
     effects: {
       *update({ payload }, { call, put, select }) {
-        let data = {}
-        for(const model in payload){
-          data[model] = list2dict( payload[model])
-        }
-        
+        const { model, data } = payload;
         yield put({
           type: 'save',
-          payload: data,
+          payload: { [dot2line(model)]: list2dict(data) },
         });
       },
     },
@@ -37,9 +41,10 @@ export default () => {
     reducers: {
       remove(state, { payload }) {
         const { model, id } = payload;
-        const data = { ...state[model] };
+        const model2 = dot2line(model);
+        const data = { ...state[model2] };
         delete data[id];
-        return { ...state, [model]: data };
+        return { ...state, [model2]: data };
       },
 
       save(state, { payload }) {

@@ -1,9 +1,9 @@
 //import baseModel from './baseModel';
 
 const my_records = {
-  1: { id: 1, name: 'n1' },
-  2: { id: 2, name: 'n2' },
-  3: { id: 3, name: 'n3' },
+  1: { id: 1, name: 'n1', title: [1,'t1'], category_id:[1,2] },
+  2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+  3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
 };
 
 const partner = ({ records }) => {

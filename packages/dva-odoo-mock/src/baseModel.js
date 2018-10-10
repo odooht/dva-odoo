@@ -1,7 +1,7 @@
 const my_records = {
-  1: { id: 1, name: 'n1' },
-  2: { id: 2, name: 'n2' },
-  3: { id: 3, name: 'n3' },
+  1: { id: 1, name: 'b1' },
+  2: { id: 2, name: 'b2' },
+  3: { id: 3, name: 'b3' },
 };
 
 const apiCreator = records => {

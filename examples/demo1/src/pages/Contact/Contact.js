@@ -1,6 +1,13 @@
 import router from 'umi/router';
 import styles from './Contact.css';
 
+import React, { Component } from 'react';
+
+import { connect } from 'dva';
+
+import { Input } from 'antd';
+import { lookup } from '@/utils/tools';
+
 export default function() {
   return (
     <div className={styles.normal}>
@@ -17,13 +24,6 @@ export default function() {
     </div>
   );
 }
-
-import React, { Component } from 'react';
-
-import { connect } from 'dva';
-
-import { Input } from 'antd';
-import { lookup } from '@/utils/tools';
 const Search = Input.Search;
 
 const ActionModel = 'contact';
@@ -104,9 +104,7 @@ class Bridge extends Component {
     const { ids, id } = this.props.contact;
 
     const login = this.props.login;
-    const { res_partner, res_users } = this.props.odooData;
-    const partners = { ...res_partner };
-    const odooUsers = { ...res_users };
+    const partners = this.props.odooData['res.partner'];
 
     const contacts = lookup(ids, partners);
     const contact = lookup(id, partners);
@@ -203,11 +201,8 @@ class Bridge extends Component {
         </div>
         <div>
           odoo:
+          {JSON.stringify( Object.keys( this.props.odooData) )}
           {JSON.stringify(this.props.odooData)}
-        </div>
-        <div>
-          users:
-          {JSON.stringify(odooUsers)}
         </div>
       </div>
     );

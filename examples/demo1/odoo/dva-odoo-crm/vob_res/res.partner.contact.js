@@ -11,7 +11,7 @@ const dvaModel = ({ namespace, model, api }) => {
           const { id, name } = payload;
           yield put({
             type: 'odooData/update',
-            payload: { [model]: [{ name, id }] },
+            payload: { model, data: [{ id, name }] },
           });
         }
       },
@@ -26,10 +26,10 @@ const odooApi = options => {
   } = options
 
   
-  const search = async (token, params) => {
+  const searchRead = async (token, params) => {
     const { domain = [] } = params;
     const dm1 = [['type', '=', 'contact']];
-    return api.search(token, { ...params, domain: [...domain, ...dm1] });
+    return api.searchRead(token, { ...params, domain: [...domain, ...dm1] });
   };
 
   const rename = async (token, params) => {
@@ -44,7 +44,6 @@ const odooApi = options => {
     return { result, error };
   };
 
-/*
   const rename2 = async (token, params) => {
     const { id, name } = params;
     const response = await api.write(token, {
@@ -56,11 +55,10 @@ const odooApi = options => {
     const { result, error } = response;
     return { result, error };
   };
-*/
 
   return {
     rename,
-    search,
+    searchRead,
   };
 };
 

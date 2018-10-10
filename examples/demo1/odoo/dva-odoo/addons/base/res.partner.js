@@ -10,9 +10,9 @@ const dvaModel = ({ namespace, model, api }) => {
         if (result) {
           yield put({
             type: 'odooData/update',
-            payload: result,
+            payload: { model, data: result },
           });
-          yield put({ type: 'insert', payload: { id: result[model][0].id } });
+          yield put({ type: 'insert', payload: { id: result[0].id } });
         }
       },
     },

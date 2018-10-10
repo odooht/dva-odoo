@@ -12,22 +12,62 @@
 
 import odooApi from './odooApi';
 
-const dvaModel = ({ model, namespace, fields, odooCall, api }) => {
-  
-  /*
-    env = {
-      field1:  odooApi(options1)
-      field2:  odooApi(options2)
-    }
 
-    many2one,
-    one2many,
-    many2many,
-many2one, one2many, many2many,
+const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
   
-  */
+  const {
+    default: default_fields = ['name'], 
+    many2one = {}, one2many = {}
+  } = out_fields
   
-//  console.log('dva model,',fields)
+//  console.log(many2one, one2many)
+
+
+  const ref_read = async (token, params, data) => {
+    const {fields=default_fields} = params
+    
+    let ref_res = []
+    
+    for (const fld of fields){
+      const ref_read = api.reference[fld]
+      
+      const one2many_ids = (data) => {
+        const ids0 = data.map( item=> item[fld] ? item[fld] : [])
+        const ids1 = [].concat.apply([], ids0 )
+        return Array.from(new Set(ids1))
+      }
+      
+      const many2one_ids = (data) => {
+        const ids0 = data.map( item=> item[fld] ? item[fld][0] : null)
+        const ids1 = ids0.filter( item => item != null)
+        return Array.from(new Set(ids1))
+      }
+      
+      const ref_model = ( fld in one2many ) ? one2many[fld].model
+                      : ( fld in many2one ) ? many2one[fld].model
+                      : null
+      
+      const ref_ids = ( fld in one2many ) ? one2many_ids(data)
+                    : ( fld in many2one ) ? many2one_ids(data)
+                    : []
+      
+//      console.log(ref_ids )
+      
+      if(ref_ids.length){
+        const rrr = await ref_read( token ,{ id:ref_ids })
+        const {result} = rrr
+        if(result){
+            ref_res.push({model:ref_model, data:result} )
+        }
+      }
+    }
+    
+//    console.log( ref_res  )
+    
+    return ref_res
+    
+  }
+
   
   return {
     namespace,
@@ -43,6 +83,11 @@ many2one, one2many, many2many,
         const { result, error } = response;
 
         if (result) {
+          const ref_res = yield ref_read(token, payload, result)
+          for(const item of ref_res){
+            yield put({ type: 'odooData/update', payload: item});
+          }
+          
           yield put({
             type: 'odooData/update',
             payload: { model, data: result },
@@ -51,6 +96,7 @@ many2one, one2many, many2many,
           yield put({ type: 'save', payload: { ids } });
         }
       },
+      
 
       *read({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
@@ -58,6 +104,11 @@ many2one, one2many, many2many,
         const { result, error } = response;
 
         if (result) {
+          const ref_res = yield ref_read(token, payload, result)
+          for(const item of ref_res){
+            yield put({ type: 'odooData/update', payload: item});
+          }
+          
           yield put({
             type: 'odooData/update',
             payload: { model, data: result },
@@ -87,6 +138,11 @@ many2one, one2many, many2many,
 
         const { result, error } = response;
         if (result) {
+          const ref_res = yield ref_read(token, payload, result)
+          for(const item of ref_res){
+            yield put({ type: 'odooData/update', payload: item});
+          }
+          
           yield put({
             type: 'odooData/update',
             payload: { model, data: result },
@@ -101,6 +157,11 @@ many2one, one2many, many2many,
         const { result, error } = response;
 
         if (result) {
+          const ref_res = yield ref_read(token, payload, result)
+          for(const item of ref_res){
+            yield put({ type: 'odooData/update', payload: item});
+          }
+          
           yield put({
             type: 'odooData/update',
             payload: { model, data: result },

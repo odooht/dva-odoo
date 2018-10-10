@@ -153,6 +153,7 @@ write  --> nothing do
 
 ## 开发日志:
 
+* 2018-10-10 many2one, one2many 字段的处理
 * 2018-10-8 更新 login 模型
 * 2018-10-7 在 npm 上发布 dva-odoo, dva-odoo-mock, dva-odoo-crm, dva-odoo-mock-crm
 * 2018-10-7 demo1 重写

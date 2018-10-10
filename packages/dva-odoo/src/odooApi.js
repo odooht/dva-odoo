@@ -1,7 +1,48 @@
+const refCreator = (options) => {
+  const {
+    model, namespace, fields:out_fields={}, odooCall 
+  } = options
+  const { default: default_fields = ['name'] } = out_fields
+  
+  const read = async (token, params) => {
+    const mock_react_api = namespace + '/' + 'read';
+
+    const {id, fields = default_fields} = params
+    const method = 'read';
+    
+    
+    //console.log( model, namespace )
+    
+    const response = await odooCall(token, {
+      model, method, 
+      args: [id, fields],
+      kwargs: { context: { mock_react_api } },
+    });
+    const { result, error } = response;
+    return { result, error };
+  };
+  
+  return read
+}
+
+
+
 const apiCreator = (options) => {
   const {
-    model, namespace, fields:{ default: default_fields = ['name'] }, odooCall 
+    model, namespace, fields:out_fields={}, odooCall 
   } = options
+  
+  const {
+    default: default_fields = ['name'], 
+    many2one = {}, one2many = {}
+  } = out_fields
+  
+  const refs = { ...many2one, ...one2many }
+  
+  let reference = {}
+  for(const fld in refs ){
+    reference[fld] = refCreator( { ...refs[fld], odooCall } )
+  }
 
   const getContext = (payload, mock_default) => {
     const { context = {} } = payload;
@@ -116,6 +157,7 @@ const apiCreator = (options) => {
   
 
   return {
+    reference,
     search,
     read,
     write,

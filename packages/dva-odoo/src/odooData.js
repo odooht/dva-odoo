@@ -2,7 +2,9 @@
 */
 
 function dot2line(model) {
-  return model.replace('.', '_');
+  return model
+  //return model.replace('.', '_');
+  
 }
 
 const list2dict = result => {

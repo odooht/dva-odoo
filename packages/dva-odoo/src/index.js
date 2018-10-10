@@ -72,6 +72,6 @@ export default options => {
     return modelExtend(dvamodel, { ...extend, namespace });
   }
 
-  //const api = odooApi(odooService.call);
+  
   return create_normal({ options, odooCall: odooService.call });
 };

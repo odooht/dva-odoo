@@ -1,34 +1,36 @@
-'use strict';
+"use strict";
 
-var _interopRequireDefault = require('@babel/runtime/helpers/interopRequireDefault');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-Object.defineProperty(exports, '__esModule', {
-  value: true,
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
 exports.default = void 0;
 
-var _toConsumableArray2 = _interopRequireDefault(
-  require('@babel/runtime/helpers/toConsumableArray')
-);
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
-var _objectSpread2 = _interopRequireDefault(
-  require('@babel/runtime/helpers/objectSpread')
-);
+var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread"));
 
 //import baseModel from './baseModel';
 var my_records = {
   1: {
     id: 1,
     name: 'n1',
+    title: [1, 't1'],
+    category_id: [1, 2]
   },
   2: {
     id: 2,
     name: 'n2',
+    title: [2, 't2'],
+    category_id: [2, 3]
   },
   3: {
     id: 3,
     name: 'n3',
-  },
+    title: [1, 't1'],
+    category_id: [3]
+  }
 };
 
 var partner = function partner(_ref) {
@@ -37,7 +39,7 @@ var partner = function partner(_ref) {
   var rename = function rename(id, name) {
     if (Object.keys(records).indexOf(id)) {
       records[id] = (0, _objectSpread2.default)({}, records[id], {
-        name: name,
+        name: name
       });
       return 1;
     }
@@ -46,18 +48,18 @@ var partner = function partner(_ref) {
   };
 
   return {
-    rename: rename,
+    rename: rename
   };
 };
 
 var _default = function _default(options) {
   var records = options.records,
-    _options$extend = options.extend,
-    extend = _options$extend === void 0 ? [] : _options$extend;
+      _options$extend = options.extend,
+      extend = _options$extend === void 0 ? [] : _options$extend;
   return {
     records: records ? records : my_records,
     inherit: 'res.partner',
-    extend: [partner].concat((0, _toConsumableArray2.default)(extend)),
+    extend: [partner].concat((0, _toConsumableArray2.default)(extend))
   };
 };
 

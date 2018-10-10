@@ -82,38 +82,27 @@ const getApp = () => {
     ],
     many2one: {
         title:{
-          inherit:'base',
+          model:'res.partner.title',
           namespace:'res.partner.title',
           fields:{default:['name']},
-          comodel_name:'res.partner.title',
           domain: []
         },
+        
     },
-      
+    
     one2many: {
         child_ids: {
-          inherit:'base',
+          model: 'res.partner', 
           namespace:'contact',
           fields:{default:['name']},
-          comodel_name: 'res.partner', 
-          inverse_name:'parent_id',
           domain: [],
-          context: {},
-          limit: 0
         },
-    }, 
-    
-    many2many: {
+
         category_id:{
-          inherit:'base',
+          model:'res.partner.category', 
           namespace:'res.partner.category',
           fields:{default:['name']},
-          comodel_name:'res.partner.category', 
-          column1: 'partner_id',
-          column2: 'category_id',
           domain: [],
-          context: {},
-          limit: 0
         }
     },
       
@@ -156,8 +145,8 @@ const getApp = () => {
 const app = getApp();
 
 const test_all = async (done) => {
-  await test_login()
-  await test_read()
+  await test_login(done)
+  await test_read(done)
   await test_search()
   await test_search_view()
   await test_search_write()
@@ -166,7 +155,7 @@ const test_all = async (done) => {
   await test_search_unlink()
   await test_search_findOrCreate()
   await test_search_rename()
-  
+
   done()
 
 }
@@ -211,16 +200,27 @@ const test_search = async () => {
   })
   
   const  result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: { ids: [1, 2, 3], id: 0 },
-      odooData:{
-            res_partner: {
-              1: { id: 1, name: 'n1' },
-              2: { id: 2, name: 'n2' },
-              3: { id: 3, name: 'n3' },
-            },
+    login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
+    contact: { ids: [1, 2, 3], id: 0 },
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
     }
+  }
   
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
@@ -234,15 +234,26 @@ const test_search_view = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: { ids: [1, 2, 3], id: 2 },
-      odooData:{
-            res_partner: {
-              1: { id: 1, name: 'n1' },
-              2: { id: 2, name: 'n2' },
-              3: { id: 3, name: 'n3' },
-            },
+    login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
+    contact: { ids: [1, 2, 3], id: 2 },
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
+    }
   }
 
   
@@ -255,23 +266,32 @@ const test_search_view = async () => {
 const test_read = async () => {
   const state = await test({
     type: 'contact/read',
-    payload: { id: 1 },
+    payload: { id: 2 },
   })
 
   const result = {
       login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
       contact: { ids: [], id: 0 },
       odooData:{
-            res_partner: {
-              1: { id: 1, name: 'n1' },
-            },
+        'res.partner': {
+              '2': { id: 2, name: 'n2', title: [ 2, 't2' ], category_id: [ 2, 3 ]}
+        },
+            
+        "res.partner.category": {
+              "2": {"id": 2, "name": "b2"}, 
+              "3": {"id": 3, "name": "b3"}
+        }, 
+            
+        "res.partner.title": {
+              "2": {"id": 2, "name": "b2"}
+        }
       }
   }
 
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
-
+  
 }
 
 const test_search_write = async () => {
@@ -281,17 +301,29 @@ const test_search_write = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: { ids: [1, 2, 3], id: 2 },
-      odooData:{
-                res_partner: {
-                  1: { id: 1, name: 'n1', email: 'win@odooht' },
-                  2: { id: 2, name: 'n2' },
-                  3: { id: 3, name: 'n3' },
-                },
-      }
-  }
+    login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
+    contact: { ids: [1, 2, 3], id: 2 },
 
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
+      }
+    }
+    
+  }
   
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
@@ -309,14 +341,28 @@ const test_search_create = async () => {
   const result = {
       login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
       contact: { ids: [4, 1, 2, 3], id: 4 },
-      odooData:{
-                res_partner: {
-                  1: { id: 1, name: 'n1', email: 'win@odooht' },
-                  2: { id: 2, name: 'n2' },
-                  3: { id: 3, name: 'n3' },
+
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   4: { id: 4, name: 'n199' },
-                }
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
+    }
+      
+      
   }
 
   
@@ -334,15 +380,30 @@ const test_search_name_create = async () => {
   const result = {
       login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
       contact: { ids: [5, 4, 1, 2, 3], id: 5 },
-      odooData:{
-                res_partner: {
-                  1: { id: 1, name: 'n1', email: 'win@odooht' },
-                  2: { id: 2, name: 'n2' },
-                  3: { id: 3, name: 'n3' },
-                  5: { id: 5, name: 'n198' },
+
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   4: { id: 4, name: 'n199' },
-                },
+                  5: { id: 5, name: 'n198' },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
+    }
+      
+      
+      
   }
 
   
@@ -363,14 +424,28 @@ const test_search_unlink = async () => {
                 ids: [5, 1, 2, 3],
                 id: 5,
               },
-      odooData:{
-                res_partner: {
-                  1: { id: 1, name: 'n1', email: 'win@odooht' },
-                  2: { id: 2, name: 'n2' },
-                  3: { id: 3, name: 'n3' },
+
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   5: { id: 5, name: 'n198' },
-                },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
+    }
+      
+      
   }
 
   for( const key of Object.keys(result) ){
@@ -392,15 +467,29 @@ const test_search_findOrCreate = async () => {
                 ids: [6, 5, 1, 2, 3],
                 id: 6,
               },
-      odooData:{
-                res_partner: {
-                  1: { id: 1, name: 'n1', email: 'win@odooht' },
-                  2: { id: 2, name: 'n2' },
-                  3: { id: 3, name: 'n3' },
+
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   5: { id: 5, name: 'n198' },
                   6: { id: 6, email: 'win@odooht' },
-                },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
+    }
+      
+      
   }
 
   
@@ -422,15 +511,29 @@ const test_search_rename = async () => {
                 ids: [6, 5, 1, 2, 3],
                 id: 6,
               },
-      odooData:{
-                res_partner: {
-                  1: { id: 1, name: 'n1', email: 'win@odooht' },
-                  2: { id: 2, name: 'n22' },
-                  3: { id: 3, name: 'n3' },
+      
+    odooData:{
+      'res.partner': {
+        1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
+        2: { id: 2, name: 'n22', title: [2,'t2'], category_id:[2,3] },
+        3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   5: { id: 5, name: 'n198' },
                   6: { id: 6, email: 'win@odooht' },
-                },
+      },
+            
+      "res.partner.category": {
+        "1": {"id": 1, "name": "b1"}, 
+        "2": {"id": 2, "name": "b2"}, 
+        "3": {"id": 3, "name": "b3"}
+      }, 
+            
+      "res.partner.title": {
+        "1": {"id": 1, "name": "b1"},
+        "2": {"id": 2, "name": "b2"}
       }
+    }
+      
+      
   }
 
   

@@ -1,6 +1,6 @@
 {
   "name": "dva-odoo-mock",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A mock for dva-odoo.",
   "repository": {
     "type": "git",

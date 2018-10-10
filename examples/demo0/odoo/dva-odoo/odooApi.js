@@ -1,47 +1,89 @@
 const refCreator = (options) => {
   const {
-    model, namespace, fields:out_fields={}, odooCall 
+    model, namespace, fields:out_fields={}, odooCall
   } = options
   const { default: default_fields = ['name'] } = out_fields
-  
+
   const read = async (token, params) => {
     const mock_react_api = namespace + '/' + 'read';
 
     const {id, fields = default_fields} = params
     const method = 'read';
-    
-    
-    //console.log( model, namespace )
-    
+
     const response = await odooCall(token, {
-      model, method, 
+      model, method,
       args: [id, fields],
       kwargs: { context: { mock_react_api } },
     });
     const { result, error } = response;
     return { result, error };
   };
-  
+
   return read
 }
 
-
-
 const apiCreator = (options) => {
   const {
-    model, namespace, fields:out_fields={}, odooCall 
+    model, namespace, fields:out_fields={}, odooCall
   } = options
-  
+
   const {
-    default: default_fields = ['name'], 
+    default: default_fields = ['name'],
     many2one = {}, one2many = {}
   } = out_fields
-  
+
   const refs = { ...many2one, ...one2many }
-  
+
   let reference = {}
   for(const fld in refs ){
     reference[fld] = refCreator( { ...refs[fld], odooCall } )
+  }
+
+  const ref_read = async (token, fields, data) => {
+    let ref_res = {}
+
+
+    for (const fld of fields){
+      const reference_read = reference[fld]
+
+      const one2many_ids = (data) => {
+        console.log(data)
+        const ids0 = data.map( item=> item[fld] ? item[fld] : [])
+
+        console.log(fld, ids0)
+
+        const ids1 = [].concat.apply([], ids0 )
+        console.log(ids1)
+        return Array.from(new Set(ids1))
+      }
+
+      const many2one_ids = (data) => {
+        const ids0 = data.map( item=> item[fld] ? item[fld][0] : null)
+        const ids1 = ids0.filter( item => item != null)
+        return Array.from(new Set(ids1))
+      }
+
+      const ref_model = ( fld in one2many ) ? one2many[fld].model
+                      : ( fld in many2one ) ? many2one[fld].model
+                      : null
+
+      const ref_ids = ( fld in one2many ) ? one2many_ids(data)
+                    : ( fld in many2one ) ? many2one_ids(data)
+                    : []
+
+//      console.log(fld,ref_model,ref_ids)
+
+      if(ref_ids.length){
+        const rrr = await reference_read( token ,{ id:ref_ids })
+        const {result} = rrr
+        if(result){
+            ref_res[ref_model]= result
+        }
+      }
+    }
+
+    return ref_res
+
   }
 
   const getContext = (payload, mock_default) => {
@@ -56,11 +98,19 @@ const apiCreator = (options) => {
     const {domain, fields = default_fields} = params
     const method = 'search_read';
     const response = await odooCall(token, {
-      model, method, 
-      args: [domain, fields], 
+      model, method,
+      args: [domain, fields],
       kwargs: { context },
     });
     const { result, error } = response;
+    if(result){
+        const ref_res = await ref_read(token, fields, result)
+        const result2 = {...ref_res, [model]:result}
+
+//        console.log(result,ref_res)
+
+        return {result: result2, error}
+    }
     return { result, error };
   };
 
@@ -69,11 +119,17 @@ const apiCreator = (options) => {
     const {id, fields = default_fields} = params
     const method = 'read';
     const response = await odooCall(token, {
-      model, method, 
+      model, method,
       args: [id, fields],
       kwargs: { context },
     });
     const { result, error } = response;
+
+    if(result){
+        const ref_res = await ref_read(token, fields, result)
+        const result2 = {...ref_res, [model]:result}
+        return {result: result2, error}
+    }
     return { result, error };
   };
 
@@ -154,7 +210,7 @@ const apiCreator = (options) => {
     const { result, error } = response;
     return { result, error };
   };
-  
+
 
   return {
     reference,

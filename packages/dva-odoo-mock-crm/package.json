@@ -1,6 +1,6 @@
 {
   "name": "dva-odoo-mock-crm",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A mock for dva-odoo-crm.",
   "repository": {
     "type": "git",

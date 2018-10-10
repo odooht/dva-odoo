@@ -1,7 +1,7 @@
 import service from '@/services/odooService';
 
-import dvaOdoo from 'dva-odoo';
-import dvaOdooCrm from 'dva-odoo-crm';
+import dvaOdoo from '../../../../odoo/dva-odoo';
+import dvaOdooCrm from '../../../../odoo/dva-odoo-crm';
 
 const dvaModel = ({ namespace, model, api }) => {
   return {
@@ -20,6 +20,9 @@ const dvaModel = ({ namespace, model, api }) => {
           context: { mock: 'queryBySmallId' },
         });
         const { result, error } = response;
+
+        console.log(response)
+
         if (result) {
           yield put({
             type: 'odooData/update',

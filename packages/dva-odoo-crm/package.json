@@ -1,6 +1,6 @@
 {
   "name": "dva-odoo-crm",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "a crm addons for dva odoo.",
   "repository": {
     "type": "git",

@@ -1,17 +1,8 @@
 
-const list2dict = result => {
-  if (result) {
-    let res1 = {};
-    for (let r of result) {
-      res1[r.id] = r;
-    }
-    return res1;
-  } else {
-    return result;
-  }
-};
-
 export default () => {
+  
+  
+  
   return {
     namespace: 'odooData',
 
@@ -22,15 +13,15 @@ export default () => {
 
     effects: {
       *update({ payload }, { call, put, select }) {
-        let data = {}
-        for(const model in payload){
-          data[model] = list2dict( payload[model])
-        }
+        const data = Object.keys(payload).reduce((acc,cur)=>{
+          acc[cur] = payload[cur].reduce(function(acc, cur) {
+            acc[cur.id] = cur;
+            return acc;
+          }, {});
+          return acc
+        },{})
         
-        yield put({
-          type: 'save',
-          payload: data,
-        });
+        yield put({ type: 'save', payload: data });
       },
     },
 

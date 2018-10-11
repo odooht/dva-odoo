@@ -3,17 +3,12 @@
     read, search, create, write, unlink.
 
   TBD: check and rewrite reducer method.
-
-  many2one
-  one2many
-  many2many
-
 */
 
 import odooApi from './odooApi';
 
 
-const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
+const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
   
   const {
     default: default_fields = ['name'], 

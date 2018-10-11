@@ -9,10 +9,8 @@ const dvaModel = ({ namespace, model, api }) => {
         const { result, error } = response;
         if (result) {
           const { id, name } = payload;
-          yield put({
-            type: 'odooData/update',
-            payload: { [model]: [{ name, id }] },
-          });
+          const data = { [model]: [{name, id}] } 
+          yield put({ type:'odooData/update', payload: data });
         }
       },
     },
@@ -21,11 +19,7 @@ const dvaModel = ({ namespace, model, api }) => {
 };
 
 const odooApi = options => {
-  const {
-    model, namespace, fields:{ default: default_fields = ['name'] }, odooCall, api 
-  } = options
-
-  
+  const {model, namespace, api, fields:{default: default_fields = ['name'] }} = options
   const search = async (token, params) => {
     const { domain = [] } = params;
     const dm1 = [['type', '=', 'contact']];
@@ -35,33 +29,14 @@ const odooApi = options => {
   const rename = async (token, params) => {
     const { id, name } = params;
     const response = await api.write(token, {
-      model,
-      id,
-      vals: { name },
+      model, id, vals: { name }, 
       context: { mock: 'rename' },
     });
     const { result, error } = response;
     return { result, error };
   };
 
-/*
-  const rename2 = async (token, params) => {
-    const { id, name } = params;
-    const response = await api.write(token, {
-      model,
-      id,
-      vals: { name },
-      // context: {mock:'rename'}
-    });
-    const { result, error } = response;
-    return { result, error };
-  };
-*/
-
-  return {
-    rename,
-    search,
-  };
+  return { rename, search };
 };
 
 export default child => {

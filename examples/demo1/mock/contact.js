@@ -12,27 +12,17 @@ const my_records = {
   4: { id: 4, name: 'c4', email: '', title:[1,'t1'], category_id: [3] },
 };
 
-const str2int = ids => {
-  const res = [];
-  for (var id of ids) {
-    res.push(parseInt(id));
-  }
-  return res;
-};
 
 const creator = ({ records }) => {
   return {
     queryBySmallId: (domain, kwargs) => {
-      const ids0 = Object.keys(records);
-      const ids = str2int(ids0);
-      const id0 = domain[0][2];
-      const res = [];
-      for (var id of ids) {
-        if (id >= id0) {
-          res.push(records[id]);
-        }
-      }
-      return res;
+      const small_id = domain[0][2];
+
+      return Object.keys(records)
+        .map(item => parseInt(item))
+        .filter(item => item >= small_id)
+        .map(item=> records[item])
+
     },
   };
 };

@@ -48,6 +48,40 @@ dva-odoo 不断完善成长中, 逐步定义扩展多个模型模版.
 4. service:   访问 odoo 的 service 接口
 5. odooApi:   自定义的 api 扩展部分
 6. dvaModel:  自定义的 dva 模型扩展部分
+7. fields:{default,many2one,one2many}:  模型的字段定义, 对象类型
+
+```
+fields:{
+  default:['name','title','category_id'],
+  many2one: {
+    title:{
+      model: 'res.partner.title',
+      namespace: 'res.partner.title',
+      domain: [],
+      fields: {default:['name']}
+    }
+  }
+  one2many: {
+    category_id:{
+      model: 'res.partner.category',
+      namespace: 'res.partner.category',
+      domain: [],
+      fields: {default:['name']}
+    }
+  }
+}
+```
+8. 以下 9-16 条是对上述第7条 fields 的解释 
+9. default: 数组类型, read 时, 默认的字段参数
+10. many2one: 对象类型, key 为多对一字段名, value 为二次访问请求时需要的参数
+11. one2many: 对象类型, key 为一对多或着多对多字段名, value 为二次访问请求时需要的参数
+12. model: 承上, 多对一/一对多,/多对多字段, 对应的 odoo 模型
+13. namespace: 承上,  多对一/一对多/多对多字段, 对应的 dva model namespace, 通常与 model 相同
+14. fields: 承上,  多对一/一对多/多对多字段, 读取时, fields 定义,
+15. 目前, 不实现 fields 的再次级联, 再次实现 many2one, one2many
+16. domain: 在进行编辑新增功能, 多对一字段候选取值的过滤条件
+
+
 
 ### 基础模型 
 1. 名称为 base, 被继承时给 inherit 赋值 'base'
@@ -74,7 +108,7 @@ dva-odoo 不断完善成长中, 逐步定义扩展多个模型模版.
 4. 模型名称, 在标准模型的基础上扩展, 'res.partner-contact'
 5. 模型名称, 不能与标准模型名称重名, 用 '-' 做名称的连接符, 确保不与标准模型名称重名
 6. 来自不同的第三方扩展模块, 如 dva-odoo-xxx 与 dva-odoo-yyy 中的扩展模型, 
-   若在一个项目中使用, 不能重名
+   若在一个项目中使用, 模型名不能重名
 7. 不需要指定 odoo 模型名称, 因为继承自的标准模型中已有定义
 8. 自定义的 api 是在调用标准模型的 api 的基础上的一个重写或扩展
 9. 自定义的 api 可以定义 mock 名称, 也可以使用标准模型的 mock 名称
@@ -98,7 +132,9 @@ dva-odoo 不断完善成长中, 逐步定义扩展多个模型模版.
 
 
 ---
-# dva-odoo 扩展
+# dva-odoo 扩展机制
+
+扩展命名方法: dva-odoo-xxx , 如 dva-odoo-crm
 
 dva-odoo 扩展包括两种情况, 
 1. 自定义的 odoo 非官方模块, 不包含在 dva-odoo 中
@@ -118,15 +154,6 @@ dva-odoo 扩展包括两种情况,
 ##  TBD
 
 ---
-定义 model 时, 设定 fields
-read 时, many2one 字段, 返回值是 [id, name] 格式
-read 时, many2many 和 one2many 字段, 返回值是 [id1,id2,...]
-
-模型定义时, fields 中给出缺省查询时有哪些字段
-另外增加一个参数, fields-define 中给出 字段定义, 主要是 数据类型
-
-在 search 方法中, 根据
-
 metaModel 的 reducers 方法需要check重构
 put odooData/update 不易于理解
 重新定义几个 effect 处理 odooData/update
@@ -153,6 +180,7 @@ write  --> nothing do
 
 ## 开发日志:
 
+* 2018-10-11 更新 login api
 * 2018-10-10 many2one, one2many 字段的处理
 * 2018-10-8 更新 login 模型
 * 2018-10-7 在 npm 上发布 dva-odoo, dva-odoo-mock, dva-odoo-crm, dva-odoo-mock-crm

@@ -1,5 +1,10 @@
 import dvaOdoo from '../../odoo/dva-odoo'
 
-export default dvaOdoo({
+const ss = dvaOdoo({
   inherit: 'odooData',
 });
+
+
+console.log(ss)
+
+export default ss

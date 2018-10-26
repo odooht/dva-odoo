@@ -55,7 +55,12 @@ import service from '@services/service'
 import dvaOdoo from 'dva-odoo'
 
 const odooApi = (options)=> {
-  const { model, namespace, fields:fields_default=['name'], odooCall, api } = options
+  const {
+    model, namespace, odooCall, api, 
+    fields:{ default=['name'] } 
+  } = options
+  
+  
   const foo = async (token, params) =>{
     const res1 = await odooCall(token,params: {model, method, args, kwargs})
     const res2 = await api.read(token,params: {id, fields})
@@ -110,6 +115,27 @@ export default dvaOdoo({
   service,
   odooApi,
   dvaModel,
+  fields:{
+    default:  ['name'],
+    many2one: {
+      title:{
+        model: 'res.partner.title',
+        namespace: 'res.partner.title',
+        domain:[],
+        fields:{default:[name]}
+      }
+    },
+
+    one2many: {
+      category_id:{
+        model: 'res.partner.category',
+        namespace: 'res.partner.category',
+        domain:[],
+        fields:{default:[name]}
+      }
+    }
+
+  }
 })
 
 ```
@@ -121,5 +147,5 @@ export default dvaOdoo({
 * service: 访问 odoo 服务的接口
 * odooApi:  自定义的 api 扩展部分
 * dvaModel: 自定义的 dva model 扩展部分
-
+* fields
 

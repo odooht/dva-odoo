@@ -1,13 +1,27 @@
 /*
   TBD:  after login,
    1 how to save data,
-   2 how to send msg to page
    3 call userinfo?
 */
 
-//import dvaOdooServices from './odooServices';
+
+const loginApi = (odooService) => {
+  const login = async (params) => {
+    const response = await odooService.login(params)
+    const { result, error } = response;
+    return result
+  }
+  
+  return {
+    login
+  }
+
+}
 
 export default odooService => {
+  
+  const api = loginApi(odooService)
+  
   return {
     namespace: 'login',
 
@@ -18,9 +32,7 @@ export default odooService => {
 
     effects: {
       *login({ payload }, { call, put, select }) {
-        const response = yield odooService.login(payload);
-        const { result, error: errormsg } = response;
-        const data = result;
+        const data = yield api.login(payload);
 
         if (data.status === 'ok') {
           /* check login result, save login info: sid, uid */
@@ -28,7 +40,7 @@ export default odooService => {
           const { uid: id } = data;
         } else {
           // ? how to update state?
-           console.log('11',response)
+          // console.log('11',response)
         }
       },
     },

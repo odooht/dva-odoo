@@ -14,12 +14,12 @@ import odooApi from './odooApi';
 
 
 const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
-  
+
   const {
-    default: default_fields = ['name'], 
+    default: default_fields = ['name'],
     many2one = {}, one2many = {}
   } = out_fields
-  
+
   return {
     namespace,
     state: {
@@ -42,7 +42,7 @@ const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
           yield put({ type: 'save', payload: { ids } });
         }
       },
-      
+
       *read({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
         const response = yield api.read(token, payload);
@@ -102,7 +102,7 @@ const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
 
       *unlink({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        
+
         const response = yield api.unlink(token, payload);
         const { result, error } = response;
         if (result) {

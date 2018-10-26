@@ -17,20 +17,3 @@ export function toArray(field, operator, value) {
   return [field, operator, value];
 }
 
-export function get_ids(id, partners) {
-  const ids = [];
-  for (var index in partners) {
-    /* user-defined */
-    if (index > id) {
-      ids.push(parseInt(index));
-    }
-  }
-  return ids;
-}
-
-export function get_newId(partners) {
-  const ids = Object.keys(partners);
-  const newids = [0, ...ids];
-  const id = Math.max(...newids) + 1;
-  return id;
-}

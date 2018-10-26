@@ -47,13 +47,13 @@ const apiCreator = (options) => {
       const reference_read = reference[fld]
 
       const one2many_ids = (data) => {
-        console.log(data)
+        //console.log(data)
         const ids0 = data.map( item=> item[fld] ? item[fld] : [])
 
-        console.log(fld, ids0)
+        //console.log(fld, ids0)
 
         const ids1 = [].concat.apply([], ids0 )
-        console.log(ids1)
+        //console.log(ids1)
         return Array.from(new Set(ids1))
       }
 

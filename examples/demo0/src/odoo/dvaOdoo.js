@@ -30,7 +30,7 @@ const models = {
 
   ogGameTeam: { default: [
     'name','number','game_id','group_id','player_ids',
-    'roundinfo_ids',
+    'round_info_ids',
     'score','score_manual','score_uom'
   ]},
 

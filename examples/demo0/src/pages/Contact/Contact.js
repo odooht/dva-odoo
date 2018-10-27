@@ -28,7 +28,7 @@ const Search = Input.Search;
 
 const ActionModel = 'contact';
 
-@connect(({ login, odooData, contact, user }) => ({ login, odooData, contact, user }))
+@connect(({ login, odooData, contact, resUsers }) => ({ login, odooData, contact, resUsers }))
 class Bridge extends Component {
   state = {
     users: { a: 1 },
@@ -73,7 +73,7 @@ class Bridge extends Component {
     console.log('00',this.props.odooData['res.users'])
 
     dispatch({
-      type: 'user/read', payload: { id }
+      type: 'resUsers/read', payload: { id }
     }).then(res => {
 
       console.log('user',this.props.odooData['res.users'])
@@ -90,7 +90,7 @@ class Bridge extends Component {
   getTable = (id) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'table/read', payload: { id }
+      type: 'ogTable/read', payload: { id }
     }).then(res => {
       const odooData = this.props.odooData;
       console.log('tbl ok',this.props.odooData)
@@ -119,7 +119,7 @@ class Bridge extends Component {
 
   getMyTableBoard = (id) => {
     const { dispatch } = this.props;
-    dispatch({ type: 'board/read', payload: { id }
+    dispatch({ type: 'ogBoard/read', payload: { id }
     }).then(res=>{
       console.log('bd ok',this.props.odooData)
       console.log('bd:',this.props.odooData['og.board'])
@@ -144,7 +144,7 @@ class Bridge extends Component {
     console.log(value)
 
     dispatch({
-      type: 'board/writeResult',
+      type: 'ogBoard/writeResult',
       payload: { id:board_id,declarer, contract, openlead,result}
     });
   };

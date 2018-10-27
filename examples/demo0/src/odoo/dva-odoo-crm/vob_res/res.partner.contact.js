@@ -22,10 +22,10 @@ const dvaModel = ({ namespace, model, api }) => {
 
 const odooApi = options => {
   const {
-    model, namespace, fields:{ default: default_fields = ['name'] }, odooCall, api 
+    model, namespace, fields:{ default: default_fields = ['name'] }, odooCall, api
   } = options
 
-  
+
   const search = async (token, params) => {
     const { domain = [] } = params;
     const dm1 = [['type', '=', 'contact']];
@@ -43,20 +43,6 @@ const odooApi = options => {
     const { result, error } = response;
     return { result, error };
   };
-
-/*
-  const rename2 = async (token, params) => {
-    const { id, name } = params;
-    const response = await api.write(token, {
-      model,
-      id,
-      vals: { name },
-      // context: {mock:'rename'}
-    });
-    const { result, error } = response;
-    return { result, error };
-  };
-*/
 
   return {
     rename,

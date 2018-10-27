@@ -1,10 +1,6 @@
-import dvaOdoo from '../../odoo/dva-odoo'
+import dvaOdoo from '@/odoo/dva-odoo';
 
-const ss = dvaOdoo({
+export default  dvaOdoo({
   inherit: 'odooData',
 });
 
-
-console.log(ss)
-
-export default ss

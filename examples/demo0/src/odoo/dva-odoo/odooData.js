@@ -60,10 +60,9 @@ export default () => {
       },
 
       save(state, { payload }) {
-        const model2= new_model(model)
-
         const new_state = {};
         for (var model in payload) {
+          const model2= new_model(model)
           const new_records = {};
           const old_records = state[model2] ? state[model2] : {};
           const records = payload[model];

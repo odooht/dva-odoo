@@ -1,6 +1,5 @@
-import service from '@/services/odooService';
 
-import dvaOdoo from '@/models/../../odoo/dva-odoo';
+import dvaOdoo from '@/odoo/dvaOdoo';
 
 const dvaModel = ({ namespace, model, api }) => {
   return {
@@ -29,17 +28,5 @@ const dvaModel = ({ namespace, model, api }) => {
   };
 };
 
-export default dvaOdoo({
-  model: 'og.board',
-  namespace: 'board',
-  inherit: 'og.board',
-  service,
-  dvaModel,
-  fields:{ default: [
-    'name','deal_id',
-    'number','vulnerable','dealer','hands',
-    'declarer', 'contract', 'openlead','result','ns_point','ew_point',
-    'auction', 'tricks', 'last_trick', 'current_trick',
-    'ns_win','ew_win', 'player', 'state'
-  ]}
-});
+export default dvaOdoo({ model: 'og.board',dvaModel })
+

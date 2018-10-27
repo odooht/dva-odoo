@@ -1,13 +1,5 @@
-import service from '@/services/odooService';
 
-import dvaOdoo from '@/models/../../odoo/dva-odoo';
+import dvaOdoo from '@/odoo/dvaOdoo';
 
-export default dvaOdoo({
-  model: 'og.game.group',
-  namespace: 'gameGroup',
-  inherit: 'og.game.group',
-  service,
-  fields:{ default: [
-    'name','game_id','team_ids'
-  ]}
-});
+export default dvaOdoo({ model: 'og.game.group' })
+

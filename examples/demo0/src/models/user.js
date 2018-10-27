@@ -1,20 +1,5 @@
-import service from '@/services/odooService';
 
-import dvaOdoo from '@/models/../../odoo/dva-odoo';
+import dvaOdoo from '@/odoo/dvaOdoo';
 
-const ss =  dvaOdoo({
-  model: 'res.users',
-  namespace: 'user',
-  inherit: 'res.users',
-  service,
-  fields:{ default: [
-    'name', 'login', 'todo_table_ids','done_table_ids'
-  ]}
-});
+export default dvaOdoo({ model: 'res.users' })
 
-
-
-
-console.log(ss)
-
-export default ss

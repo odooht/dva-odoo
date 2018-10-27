@@ -96,7 +96,6 @@ class Bridge extends Component {
       console.log('tbl ok',this.props.odooData)
       console.log('tbl:',this.props.odooData['og.table'])
 
-
       console.log('table:',id,odooData)
       const tables = lookup( id, odooData['og.table'] )
 

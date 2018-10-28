@@ -3,23 +3,18 @@
     read, search, create, write, unlink.
 
   TBD: check and rewrite reducer method.
-
-  many2one
-  one2many
-  many2many
-
 */
 
 import odooApi from './odooApi';
 
 
-const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
-
+const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
+  
   const {
-    default: default_fields = ['name'],
+    default: default_fields = ['name'], 
     many2one = {}, one2many = {}
   } = out_fields
-
+  
   return {
     namespace,
     state: {
@@ -28,43 +23,93 @@ const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
     },
 
     effects: {
-      *search({ payload }, { call, put, select }) {
-        const token = yield select(state => state.login.sid);
-        const response = yield api.search(token, payload);
-        const { result, error } = response;
+      *view({ payload }, { call, put, select }) {
+        const { id: pid } = payload;
+        const { id: oid, ids: oids } = yield select(state => state[namespace]);
 
-        if (result) {
-          yield put({
-            type: 'odooData/update',
-            payload: result,
-          });
-          const ids = result[model].map(item => item.id);
-          yield put({ type: 'save', payload: { ids } });
+        if (oids.indexOf(pid) >= 0) {
+          yield put({ type: 'save', payload: { id: pid } });
         }
       },
 
-      *read({ payload }, { call, put, select }) {
+      *search({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
-        const response = yield api.read(token, payload);
+        const method = 'search'
+        const params = payload
+        const response = yield api[method](token, params);
+        yield put({ type: 'response',  payload: { method, params,response } })
+      },
+      
+      *read({ payload }, { call, put, select }) {
+        const method = 'read'
+        const params = payload
+        const token = yield select(state => state.login.sid);
+        const response = yield api[method](token, params);
+        yield put({ type: 'response',  payload: { method, params,response } })
+      },
+
+      *write({ payload }, { call, put, select }) {
+        const method = 'write'
+        const params = payload
+        const token = yield select(state => state.login.sid);
+        const response = yield api[method](token, params);
+        yield put({ type: 'response',  payload: { method, params,response } })
+      },
+
+      *nameCreate({ payload }, { call, put, select }) {
+        const method = 'nameCreate'
+        const params = payload
+        const token = yield select(state => state.login.sid);
+        const response = yield api[method](token, params);
+        yield put({ type: 'response',  payload: { method, params,response } })
+      },
+
+      *create({ payload }, { call, put, select }) {
+        const method = 'create'
+        const params = payload
+        const token = yield select(state => state.login.sid);
+        const response = yield api[method](token, params);
+        yield put({ type: 'response',  payload: { method, params,response } })
+      },
+
+      *unlink({ payload }, { call, put, select }) {
+        const method = 'unlink'
+        const params = payload
+        const token = yield select(state => state.login.sid);
+        const response = yield api[method](token, params);
+        yield put({ type: 'response',  payload: { method, params,response } })
+      },
+
+      *response({ payload }, { call, put, select }){
+        const { method } = payload
+        yield put({ type: method + '_response', payload })
+      },
+      
+      *search_response({ payload}, { call, put, select }){
+        const { params,response } = payload
+        const { result, error } = response;
+        if (result) {
+          yield put({ type: 'odooData/update', payload: result });
+          const ids = result[model].map(item => item.id);
+          yield put({ type: 'save', payload: { ids } });
+        }        
+      },
+      
+      *read_response({ payload}, { call, put, select }){
+        const { params,response } = payload
         const { result, error } = response;
 
         if (result) {
-          yield put({
-            type: 'odooData/update',
-            payload: result,
-          });
-
+          yield put({ type: 'odooData/update', payload: result });
           // ??? TBD how to update ids and id
         }
       },
 
-      *write({ payload }, { call, put, select }) {
-        const token = yield select(state => state.login.sid);
-        const response = yield api.write(token, payload);
+      *write_response({ payload}, { call, put, select }){
+        const { params,response } = payload
         const { result, error } = response;
-
         if (result) {
-          const { id, vals } = payload;
+          const { id, vals } = params;
           yield put({
             type: 'odooData/update',
             payload: { [model]: [{ ...vals, id }] },
@@ -72,10 +117,8 @@ const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
         }
       },
 
-      *nameCreate({ payload }, { call, put, select }) {
-        const token = yield select(state => state.login.sid);
-        const response = yield api.nameCreate(token, payload);
-
+      *nameCreate_response({ payload}, { call, put, select }){
+        const { params,response } = payload
         const { result, error } = response;
         if (result) {
           yield put({
@@ -86,9 +129,8 @@ const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
         }
       },
 
-      *create({ payload }, { call, put, select }) {
-        const token = yield select(state => state.login.sid);
-        const response = yield api.create(token, payload);
+      *create_response({ payload}, { call, put, select }){
+        const { params,response } = payload
         const { result, error } = response;
 
         if (result) {
@@ -100,27 +142,16 @@ const dvaModel = ({ model, namespace, fields: out_fields, odooCall, api }) => {
         }
       },
 
-      *unlink({ payload }, { call, put, select }) {
-        const token = yield select(state => state.login.sid);
-
-        const response = yield api.unlink(token, payload);
+      *unlink_response({ payload}, { call, put, select }){
+        const { params,response } = payload
         const { result, error } = response;
         if (result) {
-          const { id } = payload;
+          const { id } = params;
           yield put({
             type: 'odooData/remove',
             payload: { model, id },
           });
           yield put({ type: 'remove', payload: { id } });
-        }
-      },
-
-      *view({ payload }, { call, put, select }) {
-        const { id: pid } = payload;
-        const { id: oid, ids: oids } = yield select(state => state[namespace]);
-
-        if (oids.indexOf(pid) >= 0) {
-          yield put({ type: 'save', payload: { id: pid } });
         }
       },
     },

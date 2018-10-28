@@ -203,19 +203,19 @@ const test_search = async () => {
     login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
     contact: { ids: [1, 2, 3], id: 0 },
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -238,19 +238,19 @@ const test_search_view = async () => {
     login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
     contact: { ids: [1, 2, 3], id: 2 },
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -274,16 +274,16 @@ const test_read = async () => {
       login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
       contact: { ids: [], id: 0 },
       odooData:{
-        'res.partner': {
+        resPartner: {
               '2': { id: 2, name: 'n2', title: [ 2, 't2' ], category_id: [ 2, 3 ]}
         },
             
-        "res.partner.category": {
+        resPartnerCategory: {
               "2": {"id": 2, "name": "b2"}, 
               "3": {"id": 3, "name": "b3"}
         }, 
             
-        "res.partner.title": {
+        resPartnerTitle: {
               "2": {"id": 2, "name": "b2"}
         }
       }
@@ -306,19 +306,19 @@ const test_search_write = async () => {
     contact: { ids: [1, 2, 3], id: 2 },
 
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -344,20 +344,20 @@ const test_search_create = async () => {
       contact: { ids: [4, 1, 2, 3], id: 4 },
 
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   4: { id: 4, name: 'n199' },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -383,7 +383,7 @@ const test_search_name_create = async () => {
       contact: { ids: [5, 4, 1, 2, 3], id: 5 },
 
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
@@ -391,13 +391,13 @@ const test_search_name_create = async () => {
                   5: { id: 5, name: 'n198' },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -427,20 +427,20 @@ const test_search_unlink = async () => {
               },
 
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
                   5: { id: 5, name: 'n198' },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -470,7 +470,7 @@ const test_search_findOrCreate = async () => {
               },
 
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n2', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
@@ -478,13 +478,13 @@ const test_search_findOrCreate = async () => {
                   6: { id: 6, email: 'win@odooht' },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }
@@ -515,7 +515,7 @@ const test_search_rename = async () => {
               },
       
     odooData:{
-      'res.partner': {
+      resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
         2: { id: 2, name: 'n22', title: [2,'t2'], category_id:[2,3] },
         3: { id: 3, name: 'n3', title: [1,'t1'], category_id:[3] },
@@ -523,13 +523,13 @@ const test_search_rename = async () => {
                   6: { id: 6, email: 'win@odooht' },
       },
             
-      "res.partner.category": {
+      resPartnerCategory: {
         "1": {"id": 1, "name": "b1"}, 
         "2": {"id": 2, "name": "b2"}, 
         "3": {"id": 3, "name": "b3"}
       }, 
             
-      "res.partner.title": {
+      resPartnerTitle: {
         "1": {"id": 1, "name": "b1"},
         "2": {"id": 2, "name": "b2"}
       }

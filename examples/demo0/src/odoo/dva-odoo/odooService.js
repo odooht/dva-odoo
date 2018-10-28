@@ -16,7 +16,6 @@ export default service => {
   } = service;
 
   async function mockRequest(url, params) {
-    //console.log('request,url,',url, params)
     const url1 = url.split('?')[0];
 
     const fn = proxy['POST ' + url1];

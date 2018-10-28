@@ -21,20 +21,12 @@ const create_normal = ({ options, odooCall }) => {
     }
   };
 
-  const {
-    inherit,
-    model: odooModel,
-    namespace,
-    fields,  // default fields and fields defination
-    odooApi,
-    dvaModel, // out model is a leaf model
-    apis: outApis,
-    extend: outExtend, // out model is with a parent
+  const { inherit, namespace, fields,  model: odooModel,
+    odooApi, dvaModel, apis: outApis, extend: outExtend 
   } = options;
 
   const { model, apis = [], extend = [] } = getNewOptions({
-    inherit,
-    model: odooModel,
+    inherit, model: odooModel,
     apis: [...(outApis ? outApis : []), ...(odooApi ? [odooApi] : [])],
     extend: [...(outExtend ? outExtend : []), ...(dvaModel ? [dvaModel] : [])],
   });

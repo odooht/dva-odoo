@@ -70,16 +70,16 @@ class Bridge extends Component {
 
   getUser = (id) => {
     const { dispatch } = this.props;
-    console.log('00',this.props.odooData['res.users'])
+    console.log('00',this.props.odooData.resUsers )
 
     dispatch({
       type: 'resUsers/read', payload: { id }
     }).then(res => {
 
-      console.log('user',this.props.odooData['res.users'])
+      console.log('user',this.props.odooData.resUsers)
 
       const odooData = this.props.odooData;
-      const me = lookup(id, odooData['res.users'] )
+      const me = lookup(id, odooData.resUsers )
 
       if (me.done_table_ids){
         this.getTable(me.done_table_ids)
@@ -94,10 +94,10 @@ class Bridge extends Component {
     }).then(res => {
       const odooData = this.props.odooData;
       console.log('tbl ok',this.props.odooData)
-      console.log('tbl:',this.props.odooData['og.table'])
+      console.log('tbl:',this.props.odooData.ogTable)
 
       console.log('table:',id,odooData)
-      const tables = lookup( id, odooData['og.table'] )
+      const tables = lookup( id, odooData.ogTable )
 
 
       if (!tables){
@@ -121,7 +121,7 @@ class Bridge extends Component {
     dispatch({ type: 'ogBoard/read', payload: { id }
     }).then(res=>{
       console.log('bd ok',this.props.odooData)
-      console.log('bd:',this.props.odooData['og.board'])
+      console.log('bd:',this.props.odooData.ogBoard)
     })
     ;
 

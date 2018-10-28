@@ -104,7 +104,7 @@ class Bridge extends Component {
     const { ids, id } = this.props.contact;
 
     const login = this.props.login;
-    const partners = this.props.odooData['res.partner'];
+    const partners = this.props.odooData.resPartner;
 
     const contacts = lookup(ids, partners);
     const contact = lookup(id, partners);

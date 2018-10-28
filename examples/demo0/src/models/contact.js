@@ -15,25 +15,9 @@ const dvaModel = ({ namespace, model, api }) => {
         const token = yield select(state => state.login.sid);
         const { id, fields } = payload;
         const domain = [['id', '>=', id ? id : 0]];
-        const response = yield api.search(token, {
-          model,
-          namespace,
-          domain,
-          fields,
-          context: { mock: 'queryBySmallId' },
-        });
-        const { result, error } = response;
-
-        console.log(response)
-
-        if (result) {
-          yield put({
-            type: 'odooData/update',
-            payload: result,
-          });
-          const ids = result[model].map(item => item.id);
-          yield put({ type: 'save', payload: { ids } });
-        }
+        const params = { domain, fields, context: { mock: 'queryBySmallId' } }
+        const response = yield api.search(token, params);
+        yield put({ type: 'response', payload: {method: 'search', params, response } });
       },
     },
     reducers: {},

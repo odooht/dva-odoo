@@ -71,3 +71,9 @@ yarn.lock
 # 
 packages/dva-odoo/lib/
 packages/dva-odoo-mock/lib/
+packages/dva-odoo-crm/lib/
+
+
+# umi
+.umi
+.umi-production

@@ -6,12 +6,9 @@ const dvaModel = ({ namespace, model, api }) => {
       *rename({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
         const response = yield api.rename(token, payload);
-        const { result, error } = response;
-        if (result) {
-          const { id, name } = payload;
-          const data = { [model]: [{name, id}] } 
-          yield put({ type:'odooData/update', payload: data });
-        }
+        const { id, name } = payload;
+        const params = {id, vals:{name}}
+        yield put({ type: 'response', payload: { method:'write', params,response } })
       },
     },
     reducers: {},

@@ -71,41 +71,8 @@ const getApp = () => {
 
   const fields = {
     default: [
-        'name', 'comment',
-        'color', 'credit_limit',
-        'date', 'image', 
-        'customer', 
-        'type',
-        'title',
-        'child_ids',
-        'category_id',
+        'credit_limit',
     ],
-    many2one: {
-        title:{
-          model:'res.partner.title',
-          namespace:'res.partner.title',
-          fields:{default:['name']},
-          domain: []
-        },
-        
-    },
-    
-    one2many: {
-        child_ids: {
-          model: 'res.partner', 
-          namespace:'contact',
-          fields:{default:['name']},
-          domain: [],
-        },
-
-        category_id:{
-          model:'res.partner.category', 
-          namespace:'res.partner.category',
-          fields:{default:['name']},
-          domain: [],
-        }
-    },
-      
   }
 
   const model = dvaOdoo(

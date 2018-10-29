@@ -6,11 +6,7 @@ const dvaModel = ({ namespace, model, api }) => {
       *findOrCreate({ payload }, { call, put, select }) {
         const token = yield select(state => state.login.sid);
         const response = yield api.findOrCreate(token, payload);
-        const { result, error } = response;
-        if (result) {
-          yield put({ type: 'odooData/update', payload: result });
-          yield put({ type: 'insert', payload: { id: result[model][0].id } });
-        }
+        yield put({ type:'response', payload: { method:'create', params:{},response}})
       },
     },
     reducers: {},
@@ -54,13 +50,45 @@ const odooApi = options => {
   };
 };
 
-export default child => {
-  const { apis = [], extend = [] } = child;
+const fields = {
+    default: [
+        'name', 'comment',
+        'color',
+        'date', 
+        'type',
+        'child_ids',
+        'category_id',
+    ],
+    
+    many2one: {
+    },
+    
+    one2many: {
+        child_ids: {
+          model: 'res.partner', 
+          namespace:'contact',
+          fields:{default:['name']},
+          domain: [],
+        },
 
+        category_id:{
+          model:'res.partner.category', 
+          namespace:'res.partner.category',
+          fields:{default:['name']},
+          domain: [],
+        }
+    },
+
+}
+
+export default child => {
+  const { apis =[], extend =[], fields2 =[] } = child;
+  
   return {
     ...child,
     model: 'res.partner',
     inherit: 'base',
+    fields2: [ fields, ...fields2],
     apis: [odooApi, ...apis],
     extend: [dvaModel, ...extend],
   };

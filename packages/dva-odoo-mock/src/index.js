@@ -41,7 +41,7 @@ const mockServicesCreator = mockData => {
     const fn = outModel[method];
     const jsonrpc = { jsonrpc: 2.0, id: 1 };
 
-    return { ...jsonrpc, result: fn(...args, kwargs) };
+    return { ...jsonrpc, result: fn? fn(...args, kwargs) : params };
   };
 
   const login2 = req => {

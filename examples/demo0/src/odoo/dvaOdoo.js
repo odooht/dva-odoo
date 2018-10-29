@@ -1,7 +1,6 @@
 import service from '@/services/odooService';
-
 import dvaOdoo from './dva-odoo';
-
+import dvaOdooGame from './igame'
 
 const models = {
   resUsers: { default: [
@@ -87,8 +86,6 @@ const models = {
 
 }
 
-
-
 export default (options) => {
 
   const { model } = options
@@ -101,8 +98,9 @@ export default (options) => {
       ) + namespace0.substring(1)
 
   const inherit = model
-  return dvaOdoo({
+  return dvaOdoo(dvaOdooGame({
     ...options, namespace, model, inherit, service,
     fields: models[namespace]
-  });
+  }));
+
 }

@@ -50,13 +50,45 @@ const odooApi = options => {
   };
 };
 
-export default child => {
-  const { apis = [], extend = [] } = child;
+const fields = {
+    default: [
+        'name', 'comment',
+        'color',
+        'date', 
+        'type',
+        'child_ids',
+        'category_id',
+    ],
+    
+    many2one: {
+    },
+    
+    one2many: {
+        child_ids: {
+          model: 'res.partner', 
+          namespace:'contact',
+          fields:{default:['name']},
+          domain: [],
+        },
 
+        category_id:{
+          model:'res.partner.category', 
+          namespace:'res.partner.category',
+          fields:{default:['name']},
+          domain: [],
+        }
+    },
+
+}
+
+export default child => {
+  const { apis =[], extend =[], fields2 =[] } = child;
+  
   return {
     ...child,
     model: 'res.partner',
     inherit: 'base',
+    fields2: [ fields, ...fields2],
     apis: [odooApi, ...apis],
     extend: [dvaModel, ...extend],
   };

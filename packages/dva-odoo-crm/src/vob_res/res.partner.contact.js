@@ -36,11 +36,36 @@ const odooApi = options => {
   return { rename, search };
 };
 
+
+const fields = {
+    default: [
+        'name', 
+        'credit_limit',
+        'image', 
+        'customer', 
+        'title',
+    ],
+    
+    many2one: {
+        title:{
+          model:'res.partner.title',
+          namespace:'res.partner.title',
+          fields:{default:['name']},
+          domain: []
+        },
+    },
+    
+    one2many: {
+    },
+      
+  }
+
 export default child => {
-  const { apis = [], extend = [] } = child;
+  const { apis = [], extend = [], fields2 =[]  } = child;
   return {
     ...child,
     inherit: 'res.partner',
+    fields2: [ fields, ...fields2],
     apis: [odooApi, ...apis],
     extend: [dvaModel, ...extend],
   };

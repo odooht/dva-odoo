@@ -9,12 +9,12 @@ import odooApi from './odooApi';
 
 
 const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
-  
+
   const {
-    default: default_fields = ['name'], 
+    default: default_fields = ['name'],
     many2one = {}, one2many = {}
   } = out_fields
-  
+
   return {
     namespace,
     state: {
@@ -39,12 +39,15 @@ const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
         const response = yield api[method](token, params);
         yield put({ type: 'response',  payload: { method, params,response } })
       },
-      
+
       *read({ payload }, { call, put, select }) {
         const method = 'read'
         const params = payload
         const token = yield select(state => state.login.sid);
         const response = yield api[method](token, params);
+
+        console.log(response)
+
         yield put({ type: 'response',  payload: { method, params,response } })
       },
 
@@ -84,7 +87,7 @@ const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
         const { method } = payload
         yield put({ type: method + '_response', payload })
       },
-      
+
       *search_response({ payload}, { call, put, select }){
         const { params,response } = payload
         const { result, error } = response;
@@ -92,9 +95,9 @@ const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
           yield put({ type: 'odooData/update', payload: result });
           const ids = result[model].map(item => item.id);
           yield put({ type: 'save', payload: { ids } });
-        }        
+        }
       },
-      
+
       *read_response({ payload}, { call, put, select }){
         const { params,response } = payload
         const { result, error } = response;

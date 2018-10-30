@@ -46,8 +46,8 @@ class Bridge extends Component {
   componentDidMount() {}
 
   login = value => {
-    //const v = 'admin,123'
-    const v = 'A23,123'
+    //const v = 'A23,123'
+    const v = 'admin,123'
     const v2 = value ? value : v;
     const [user, password] = v2.split(',');
 
@@ -75,79 +75,9 @@ class Bridge extends Component {
     dispatch({
       type: 'resUsers/read', payload: { id }
     }).then(res => {
-
       console.log('user',this.props.odooData.resUsers)
-
-      const odooData = this.props.odooData;
-      const me = lookup(id, odooData.resUsers )
-
-      if (me.done_table_ids){
-        this.getTable(me.done_table_ids)
-      }
     })
   };
-
-  getTable = (id) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'ogTable/read', payload: { id }
-    }).then(res => {
-      const odooData = this.props.odooData;
-      console.log('tbl ok',this.props.odooData)
-      console.log('tbl:',this.props.odooData.ogTable)
-
-      console.log('table:',id,odooData)
-      const tables = lookup( id, odooData.ogTable )
-
-
-      if (!tables){
-        return
-      }
-
-      if (!tables[0]){
-        return
-      }
-
-      const board_ids = tables[0].board_ids
-      const board_id = tables[0].board_id[0]
-      this.setState({ board_id});
-
-      this.getMyTableBoard(board_ids)
-    })
-  };
-
-  getMyTableBoard = (id) => {
-    const { dispatch } = this.props;
-    dispatch({ type: 'ogBoard/read', payload: { id }
-    }).then(res=>{
-      console.log('bd ok',this.props.odooData)
-      console.log('bd:',this.props.odooData.ogBoard)
-    })
-    ;
-
-  };
-
-  writeResult = (value) => {
-    const { dispatch } = this.props;
-    const { board_id } = this.state;
-
-    const v2 = value ? value : 'S,3Hx,SA,2'
-
-    if( ! value ){
-      //return
-    }
-
-    const [declarer, contract, openlead, result0] = v2.split(',');
-    const result = parseInt(result0)
-
-    console.log(value)
-
-    dispatch({
-      type: 'ogBoard/writeResult',
-      payload: { id:board_id,declarer, contract, openlead,result}
-    });
-  };
-
 
   query = value => {
     const id = parseInt(value);
@@ -189,7 +119,7 @@ class Bridge extends Component {
     const { ids, id } = this.props.contact;
 
     const login = this.props.login;
-    const partners = this.props.odooData['res.partner'];
+    const partners = this.props.odooData.resPartner;
 
     const contacts = lookup(ids, partners);
     const contact = lookup(id, partners);
@@ -214,12 +144,6 @@ class Bridge extends Component {
           enterButton="Login"
           //size="large"
           onSearch={value => this.login(value)}
-        />
-        <Search
-          placeholder="declarer, contract, openlead,result"
-          enterButton="writeResult"
-          //size="large"
-          onSearch={value => this.writeResult(value)}
         />
         <Search
           placeholder="domain"

@@ -115,6 +115,8 @@ const test_all = async (done) => {
   await test_login(done)
   await test_read(done)
   await test_search()
+
+ 
   await test_search_view()
   await test_search_write()
   await test_search_create()
@@ -167,7 +169,6 @@ const test_search = async () => {
   })
   
   const  result = {
-    login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
     contact: { ids: [1, 2, 3], id: 0 },
     odooData:{
       resPartner: {
@@ -189,7 +190,6 @@ const test_search = async () => {
     }
   }
   
-  
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
@@ -202,7 +202,6 @@ const test_search_view = async () => {
   })
 
   const result = {
-    login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
     contact: { ids: [1, 2, 3], id: 2 },
     odooData:{
       resPartner: {
@@ -224,11 +223,9 @@ const test_search_view = async () => {
     }
   }
 
-  
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
-  
 }
 
 const test_read = async () => {
@@ -238,7 +235,6 @@ const test_read = async () => {
   })
   
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
       contact: { ids: [], id: 0 },
       odooData:{
         resPartner: {
@@ -259,7 +255,6 @@ const test_read = async () => {
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
-  
 }
 
 const test_search_write = async () => {
@@ -269,9 +264,7 @@ const test_search_write = async () => {
   })
 
   const result = {
-    login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
     contact: { ids: [1, 2, 3], id: 2 },
-
     odooData:{
       resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
@@ -290,14 +283,11 @@ const test_search_write = async () => {
         "2": {"id": 2, "name": "b2"}
       }
     }
-    
   }
   
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
-  
-
 }
 
 const test_search_create = async () => {
@@ -307,9 +297,7 @@ const test_search_create = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: { ids: [4, 1, 2, 3], id: 4 },
-
+    contact: { ids: [4, 1, 2, 3], id: 4 },
     odooData:{
       resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
@@ -329,10 +317,7 @@ const test_search_create = async () => {
         "2": {"id": 2, "name": "b2"}
       }
     }
-      
-      
   }
-
   
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
@@ -346,9 +331,7 @@ const test_search_name_create = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: { ids: [5, 4, 1, 2, 3], id: 5 },
-
+    contact: { ids: [5, 4, 1, 2, 3], id: 5 },
     odooData:{
       resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
@@ -369,12 +352,8 @@ const test_search_name_create = async () => {
         "2": {"id": 2, "name": "b2"}
       }
     }
-      
-      
-      
   }
 
-  
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
@@ -387,12 +366,7 @@ const test_search_unlink = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: {
-                ids: [5, 1, 2, 3],
-                id: 5,
-              },
-
+    contact: { ids: [5, 1, 2, 3], id: 5 },
     odooData:{
       resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
@@ -412,15 +386,12 @@ const test_search_unlink = async () => {
         "2": {"id": 2, "name": "b2"}
       }
     }
-      
-      
   }
 
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
   
-
 }
 
 const test_search_findOrCreate = async () => {
@@ -430,12 +401,7 @@ const test_search_findOrCreate = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: {
-                ids: [6, 5, 1, 2, 3],
-                id: 6,
-              },
-
+    contact: { ids: [6, 5, 1, 2, 3], id: 6 },
     odooData:{
       resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
@@ -456,16 +422,11 @@ const test_search_findOrCreate = async () => {
         "2": {"id": 2, "name": "b2"}
       }
     }
-      
-      
   }
 
-  
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
-  
-
 }
 
 const test_search_rename = async () => {
@@ -475,12 +436,7 @@ const test_search_rename = async () => {
   })
 
   const result = {
-      login:{ name: 'ss1', sid: 'sid1', status: 'ok', uid: 1 },
-      contact: {
-                ids: [6, 5, 1, 2, 3],
-                id: 6,
-              },
-      
+    contact: { ids: [6, 5, 1, 2, 3], id: 6 },
     odooData:{
       resPartner: {
         1: { id: 1, name: 'n1', email: 'win@odooht', title: [1,'t1'], category_id:[1,2] },
@@ -501,14 +457,12 @@ const test_search_rename = async () => {
         "2": {"id": 2, "name": "b2"}
       }
     }
-      
-      
   }
 
-  
   for( const key of Object.keys(result) ){
     expect(state[key]).toEqual(result[key]);
   }
   
-
+  console.log(state.login)
+  
 }

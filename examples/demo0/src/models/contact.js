@@ -1,8 +1,5 @@
 import service from '@/services/odooService';
 
-//import dvaOdoo from '@/models/../../odoo/dva-odoo';
-//import dvaOdooCrm from '@/models/../../odoo/dva-odoo-crm';
-
 import dvaOdoo from '@/odoo/dva-odoo';
 import dvaOdooCrm from '@/odoo/dva-odoo-crm';
 

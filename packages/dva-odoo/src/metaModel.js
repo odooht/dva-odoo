@@ -81,8 +81,10 @@ const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
       },
 
       *response({ payload }, { call, put, select }){
-        const { method } = payload
+        const { method, params, response } = payload
         yield put({ type: method + '_response', payload })
+        yield put({ type: 'login/log', payload })
+        
       },
       
       *search_response({ payload}, { call, put, select }){
@@ -157,6 +159,7 @@ const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
     },
 
     reducers: {
+    
       insert(state, { payload }) {
         const { ids } = state;
         const { id } = payload;

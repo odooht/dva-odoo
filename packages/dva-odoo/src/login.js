@@ -46,6 +46,11 @@ export default odooService => {
     },
 
     reducers: {
+      log(state, { payload }) {
+        const { log=[] } = state;
+        return { ...state, log: [...log, payload ] };
+      },
+
       save(state, { payload }) {
         return { ...state, ...payload };
       },

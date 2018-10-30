@@ -45,9 +45,6 @@ const dvaModel = ({ model, namespace, fields: out_fields, api }) => {
         const params = payload
         const token = yield select(state => state.login.sid);
         const response = yield api[method](token, params);
-
-        console.log(response)
-
         yield put({ type: 'response',  payload: { method, params,response } })
       },
 

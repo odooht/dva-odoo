@@ -1,0 +1,73 @@
+<script>
+    class App {
+        // static x = 'x';
+        // static y = 'yy';
+        constructor() {
+            this.k = 'k'
+        }
+        toString() {
+            console.log(this.k)
+        }
+    }
+
+    const handler = {
+        get(target, key) {
+            //　判断在class 和　实例中是否有这个属性　没有　创建新方法
+            if (key in target) {
+                return target[key]
+            } else if (key in target.__proto__.constructor) {
+                return target.__proto__.constructor[key]
+            } else {
+                console.log('没有这个方法,开始创建新方法')
+                if (key.split('_')[1] === 'class') {
+                    console.log('save　class')
+                    Object.assign(target.constructor, {
+                        toClass() {
+                            console.log('funvvvvsss_class', key)
+                        }
+                    })
+                    // return target.__proto__.key = function () {
+                    //   console.log(key)
+                    // }
+                } else if (key.split('_')[1] === 'target') {
+                    console.log('save target')
+                    Object.assign(target, {
+                        toTarget() {
+                            console.log('funvvvvsss_target', key)
+                        }
+                    })
+                }
+            }
+        },
+        // target 对象　　ｋｅｙ名　　ｐｒｏｘｙ　值
+        // 　判断在class 和　实例中是否有这个属性　没有　创建并赋值
+        set(target, key, proxy) {
+            if (key in target) {
+                return target[key] = proxy
+            } else if (key in target.__proto__.constructor) {
+                return target.__proto__.constructor[key] = proxy;
+            } else {
+                console.log('没有这个属性，开始赋值')
+                if (key.split('_')[1] === 'class') {
+                    console.log('save　class')
+                    return target.__proto__.constructor[key] = proxy;
+                } else if (key.split('_')[1] === 'target') {
+                    console.log('save target')
+                    return target[key] = proxy;
+                }
+            }
+        },
+    }
+    let app = new App(1, 2);
+    let proxy = new Proxy(app, handler);
+    // get 属性
+    proxy.funvvvvsss_class
+    App.toClass()
+    proxy.funvvvvsss_target
+    app.toTarget()
+    //　set 赋值
+    proxy.fund_class = 'dddd';
+    console.log('fund_class', App.fund_class)
+    proxy.fund_target = 'cccc';
+    console.log('fund_class', app.fund_target)
+</script>

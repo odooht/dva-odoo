@@ -51,24 +51,41 @@ const test_browse_multi = async (done) => {
     },{})
 
     const Users = models({model:'res.users', rpc , fields})
-    
 //    console.log(Users)
-    const uu2 = await Users.search( [['id','>',30]])
-    console.log(uu2)
+    const u0 = await Users.call('search',[[['id','>',30]]])
+
+    const users = await Users.search( [['id','>',30]])
+    console.log(users)
+    console.log(users)
+    
+
     
 //    console.log(Users._instances)
 
-//    console.log(uu2[31])
-//    console.log(uu2[31].fields('name') )
+    com = u1.getattr('com_id',1)
+    
+    u1.getattr('com_id').getattr('name')
+    u1.getattr('com_id').getattr('tels')
+    com.getattr('name')
+    u1.getattr('name')
 
-/*    
+
+
+    print u1.name
+    prin u1.age
+
+
+    u1.name
+    
+    u1.getattr('name')
+
+
+
+
 
     const uu2 = await Users.search( [['id','>',30]])
     console.log(uu2)
 
-    const uu = await Users.call('search',[[['id','>',30]]])
-    
-    //console.log(uu)
     
     console.log(Users._records)
     const uu23 = await Users.search( [['id','>',28]], ['email'])

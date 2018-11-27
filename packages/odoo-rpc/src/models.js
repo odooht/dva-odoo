@@ -122,8 +122,8 @@ const creator = (options)=>{
             
         }
         
-        fields(name){
-            return _Model._records[this._id][name]
+        getattr(attr,flag=0 ){
+            return _Model._records[this._id][attr]
         }
     
 /*
@@ -186,7 +186,45 @@ const creator = (options)=>{
 
 }
 
-  
+
+
+const test = () => {
+    users = {}
+    odooData =  users.odooData
+    
+    const get_ids = ()=> {
+      const ids = Object.keys(users).reduce((acc,key)=>{
+        acc.push(users[key].id)
+        return acc
+        
+      },[] )
+      return ids
+    }
+    
+    const flash = ( fields=['doing_table_ids'] ) => {
+      const ids = Object.keys(users).reduce((acc,key)=>{
+        const user = users[key]
+        const doing_table_ids = user.attr('doing_table_ids').then(tbls=>{
+            odooData.save('og.table',tbls)
+        })
+        
+        user = {
+            id: user.id, 
+            name: user.attr('name'),
+            doing_table_ids
+        
+        }
+        
+        odooData.save('res.users',user)
+        
+        
+      },[] )
+      return 1
+    }
+
+
+}
+
 
 export default creator
 

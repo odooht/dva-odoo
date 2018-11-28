@@ -61,3 +61,18 @@ query = async (payload,{put,call}){
                 wwww = await us[1].attr('board_ids',1 )
                 setState ({ type: save2, payload: {www} })
 }
+
+
+    com = u1.getattr('com_id',1)
+    
+    u1.getattr('com_id').getattr('name')
+    u1.getattr('com_id').getattr('tels')
+    com.getattr('name')
+    u1.getattr('name')
+    print u1.name
+    prin u1.age
+    u1.name
+    u1.getattr('name')
+
+
+

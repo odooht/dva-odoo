@@ -1,7 +1,6 @@
 import modelCreator from '../src/models'
 import RPC from '../src/rpc'
 
-
 const create_env = (models, rpc )=>{
     const env = {}
     for(const mdl in models ){
@@ -53,9 +52,5 @@ class Odoo {
     }
 
 }
-
-
-
-
 
 export default Odoo

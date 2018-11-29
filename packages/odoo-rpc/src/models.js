@@ -1,3 +1,10 @@
+/*
+
+TBD:  2018-11-29
+attr(). m2m no flash
+
+*/
+
 
 const fields_get = async (rpc, model,allfields,attributes)=>{
         const method = 'fields_get'
@@ -11,7 +18,6 @@ const fields_get = async (rpc, model,allfields,attributes)=>{
             return {}
         }
 }
-
 
 const modelCreator = async (options)=>{
     const {model, fields: fs0, rpc, env} = options
@@ -206,8 +212,6 @@ const modelCreator = async (options)=>{
     return cls
 
 }
-
-
 
 export default modelCreator
 

@@ -4,7 +4,7 @@ import Environment from './env'
 class Odoo {
     constructor(options){
         const { host，db } = options
-        this.env = null
+        this.env = {}
         this.rpc = RPC({ host,db })
     }
 

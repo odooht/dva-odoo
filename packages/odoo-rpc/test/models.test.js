@@ -40,7 +40,7 @@ const test_browse_multi = async (done) => {
     const fields = ['name','partner_id','company_id','category_id']
     const Users = await get_model({model:'res.users', rpc , fields})
 
-    const fields2 = ['name']
+    const fields2 = ['name','email']
     const Comp = await get_model({model:'res.company', rpc , fields:fields2 })
 
     const fields3 = ['name']
@@ -63,10 +63,11 @@ const test_browse_multi = async (done) => {
     console.log( us2 )
     
     console.log( us2[1].attr('name') )
-    const comp = await us2[1].attr('company_id') 
+    const comp = await us2[1].attr('company_id',1) 
     
     console.log( comp )
     console.log( comp.attr('name') )
+    console.log( comp.attr('email') )
     console.log( Comp )
     //console.log( Users._records )
     

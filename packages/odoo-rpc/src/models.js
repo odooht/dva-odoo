@@ -1,55 +1,3 @@
-import RPC from '../src/rpc'
-
-const get_rpc = () => {
-    const host = 'http://192.168.56.105:8069'
-    const db       ='TT'
-    return new RPC({host, db})
-}
-
-
-const rpc_odoo = async ()=>{
-
-              const rpc = get_rpc()
-              const login    ='admin'
-              const password ='123'
-              await rpc.login({login, password})
-              
-              
-    const model  ='res.partner'
-    const method ='fields_get'
-    const args   = []
-    const kwargs = {}
-    const params = { model, method, args, kwargs }
-    const data = await rpc.call(params)
-    
-    return data
-}
-
-
-const _search = async (cls, domain, fields) =>{
-    const fs = fields || Object.keys(cls._fields)
-    const data = await cls.call('search_read',[domain,fs ])
-    const {code} = data
-    
-    if(!code){
-        const {result} = data
-        const res = result.reduce((acc, cur)=>{
-            acc[cur.id] = ( new  cls(cur.id, cur) )
-            //const old = cls._records[cur.id] || {}
-            //cls._records[cur.id] = {...old, ...cur}
-            return acc
-        },{})
-                
-        const ids = Object.keys(res)
-        const instance = new cls(ids)
-                
-        return instance
-                
-    }
-    return new cls( [] )
-            
-
-}
 
 const fields_get = async (rpc, model,allfields,attributes)=>{
         const method = 'fields_get'
@@ -65,7 +13,7 @@ const fields_get = async (rpc, model,allfields,attributes)=>{
 }
 
 
-const creator = async (options)=>{
+const modelCreator = async (options)=>{
     const {model, fields: fs, rpc, env} = options
     
     const fields0 = await fields_get(rpc, model,fs,['type','relation'])
@@ -77,7 +25,6 @@ const creator = async (options)=>{
         return acc
     },{})
     
-
     class cls {
         static _name = model
         static _rpc = rpc
@@ -106,42 +53,18 @@ const creator = async (options)=>{
             
         }
         
-        static async call(method, args=[], kwargs={} ){
-            const params = {
-                model:this._name,
-                method, args, kwargs
-            }
-            return this._rpc.call(params)
-        }
-
-        static async search(domain, fields){
-            return _search(this, domain, fields)
-        }
-        
-        static browse(id){
-            /*
-            if (typeof id ==='object'){
-                return null
-            }
-            else{
-                const instance = cls._instances[id] || new cls(id)
-                return instance
-            }*/
-        }
-        
         list(){
-            //console.log(this._instances)
+            // only for multi
             return Object.values( this._instances )
         }
         
         byid(id){
-            // for multi
+            // only for multi
             return this._instances[id]
         }
 
-        attr(attr,flag=0 ){
-            // attr is o2m or m2m .... TBD
-
+        attr(attr,flash=0 ){
+            // only for single
             const raw = ( cls._records[this._id] || {} )[attr]
             const {type,relation} = cls._fields[attr]
             if(['many2one','one2many', 'many2many'].indexOf(type)<0 ){
@@ -151,24 +74,98 @@ const creator = async (options)=>{
             const ref_cls = this._env[relation]
             
             if( type === 'many2one'){
+                if(flash){
+                    return ref_cls.read(raw[0])
+                }
+                
                 const [id, name] = raw
                 const vals = {id,name,display_name:name}
                 const ref_ins = new ref_cls(raw[0],vals)
-                //ref_cls._records = {id:vals}
                 return ref_ins
             }
             else{
-                
-            //console.log(type,relation, ref_cls)
-                return ref_cls.search([['id','in', raw ]],['name'])
-                
-                //const ref_ins = new ref_cls(raw)
-                //return ref_ins
-               // return raw
+                return ref_cls.read(raw)
             }
         }
         
+        static async call(method, args=[], kwargs={} ){
+            const params = {
+                model:this._name,
+                method, args, kwargs
+            }
+            const data = await this._rpc.call(params)
+            const {code} = data
+            
+            if(!code){
+                const {result} = data
+                return result
+            }
+            return null 
+        }
         
+        static list2instance(result){
+            const res = result.reduce((acc, cur)=>{
+                acc[cur.id] = ( new  this(cur.id, cur) )
+                return acc
+            },{})
+                
+            const ids = Object.keys(res)
+            const instance = new this(ids)
+                
+            return instance
+        }
+        
+        static async search(domain){
+            const fields = Object.keys(cls._fields)
+            const data = await cls.call('search_read',[domain,fields ])
+            return this.list2instance( data ? data : [] )
+        }
+        
+        static async read(ids){
+            const fields = Object.keys(cls._fields)
+            const data0 = await cls.call('read',[ids,fields ])
+            const data = data0 ? data0 : []
+            
+            if (typeof ids ==='object'){
+                return this.list2instance( data)
+            }
+            else{
+                const vals = data.length ? data[0] : {}
+                return new cls(ids, vals)
+
+            }
+        }
+        
+        static async create(vals){
+            const data = await cls.call('create',[ vals ])
+            if(data){
+                return cls.read(data)
+            }
+            return data
+        }
+        
+        static async write(id, vals){
+            const data = await cls.call('write',[ id, vals ])
+            if(data){
+                return cls.read(id)
+            }
+            return data
+        }
+
+        async write( vals){
+            return cls.write(this._id, vals)
+        }
+        
+        static async unlink(id){
+            const data = await cls.call('unlink',[ id ])
+            //TBD
+            return data
+        }
+
+        async unlink( vals){
+            return cls.unlink(this._id, vals)
+        }
+                
     }
     
     Object.defineProperty(cls, 'name', {value: model, configurable: true} )
@@ -179,5 +176,5 @@ const creator = async (options)=>{
 
 
 
-export default creator
+export default modelCreator
 

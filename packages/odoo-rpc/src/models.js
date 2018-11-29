@@ -37,12 +37,12 @@ const modelCreator = async (options)=>{
     const  fields = await get_fields()
     
     class cls {
-        static _name = model
-        static _rpc = rpc
-        static _env = env
-        static _fields = fields
-        static _records = {}
-        static _instances = {}
+//        static _name = model
+//        static _rpc = rpc
+//        static _env = env
+//        static _fields = fields
+//        static _records = {}
+//        static _instances = {}
         
         constructor(ids,vals){
             if(typeof(ids) === 'object' ){
@@ -206,6 +206,15 @@ const modelCreator = async (options)=>{
         }
                 
     }
+    
+    cls._name = model
+    cls._rpc = rpc
+    cls._env = env
+    cls._fields = fields
+    cls._records = {}
+    cls._instances = {}
+
+
     
     Object.defineProperty(cls, 'name', {value: model, configurable: true} )
   

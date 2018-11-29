@@ -15,8 +15,6 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
-
 var dvaModel = function dvaModel(_ref) {
   var namespace = _ref.namespace,
       model = _ref.model,
@@ -28,7 +26,7 @@ var dvaModel = function dvaModel(_ref) {
       rename:
       /*#__PURE__*/
       _regenerator.default.mark(function rename(_ref2, _ref3) {
-        var payload, call, put, select, token, response, result, error, id, name;
+        var payload, call, put, select, token, response, id, name, params;
         return _regenerator.default.wrap(function rename$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -47,24 +45,24 @@ var dvaModel = function dvaModel(_ref) {
 
               case 7:
                 response = _context.sent;
-                result = response.result, error = response.error;
-
-                if (!result) {
-                  _context.next = 13;
-                  break;
-                }
-
                 id = payload.id, name = payload.name;
-                _context.next = 13;
+                params = {
+                  id: id,
+                  vals: {
+                    name: name
+                  }
+                };
+                _context.next = 12;
                 return put({
-                  type: 'odooData/update',
-                  payload: (0, _defineProperty2.default)({}, model, [{
-                    name: name,
-                    id: id
-                  }])
+                  type: 'response',
+                  payload: {
+                    method: 'write',
+                    params: params,
+                    response: response
+                  }
                 });
 
-              case 13:
+              case 12:
               case "end":
                 return _context.stop();
             }
@@ -79,10 +77,9 @@ var dvaModel = function dvaModel(_ref) {
 var odooApi = function odooApi(options) {
   var model = options.model,
       namespace = options.namespace,
+      api = options.api,
       _options$fields$defau = options.fields.default,
-      default_fields = _options$fields$defau === void 0 ? ['name'] : _options$fields$defau,
-      odooCall = options.odooCall,
-      api = options.api;
+      default_fields = _options$fields$defau === void 0 ? ['name'] : _options$fields$defau;
 
   var search =
   /*#__PURE__*/
@@ -159,20 +156,6 @@ var odooApi = function odooApi(options) {
       return _ref5.apply(this, arguments);
     };
   }();
-  /*
-    const rename2 = async (token, params) => {
-      const { id, name } = params;
-      const response = await api.write(token, {
-        model,
-        id,
-        vals: { name },
-        // context: {mock:'rename'}
-      });
-      const { result, error } = response;
-      return { result, error };
-    };
-  */
-
 
   return {
     rename: rename,
@@ -180,13 +163,31 @@ var odooApi = function odooApi(options) {
   };
 };
 
+var fields = {
+  default: ['name', 'credit_limit', 'image', 'customer', 'title'],
+  many2one: {
+    title: {
+      model: 'res.partner.title',
+      namespace: 'res.partner.title',
+      fields: {
+        default: ['name']
+      },
+      domain: []
+    }
+  },
+  one2many: {}
+};
+
 var _default = function _default(child) {
   var _child$apis = child.apis,
       apis = _child$apis === void 0 ? [] : _child$apis,
       _child$extend = child.extend,
-      extend = _child$extend === void 0 ? [] : _child$extend;
+      extend = _child$extend === void 0 ? [] : _child$extend,
+      _child$fields = child.fields2,
+      fields2 = _child$fields === void 0 ? [] : _child$fields;
   return (0, _objectSpread2.default)({}, child, {
     inherit: 'res.partner',
+    fields2: [fields].concat((0, _toConsumableArray2.default)(fields2)),
     apis: [odooApi].concat((0, _toConsumableArray2.default)(apis)),
     extend: [dvaModel].concat((0, _toConsumableArray2.default)(extend))
   });

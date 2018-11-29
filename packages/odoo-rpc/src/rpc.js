@@ -66,7 +66,7 @@ const jsonrpc = (url, params)=>{
     
   };
   
-  return _fetch( url, options , 3000)
+  return _fetch( url, options , 10000)
         .then( res => {
           //  console.log('1st',res)
             return checkStatus(res)

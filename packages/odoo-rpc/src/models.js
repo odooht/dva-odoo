@@ -14,26 +14,31 @@ const fields_get = async (rpc, model,allfields,attributes)=>{
 
 
 const modelCreator = async (options)=>{
-    const {model, fields: fs, rpc, env} = options
+    const {model, fields: fs0, rpc, env} = options
     
-    const fields0 = await fields_get(rpc, model,fs,['type','relation'])
-
-    const fields = Object.keys(fields0).reduce( (acc,cur)=>{
-        if(fs.indexOf(cur)>=0 ){
-            acc[cur] = fields0[cur]
-        } 
-        return acc
-    },{})
+    const fs = fs0 ?  fs0 : ['id','name']
+    
+    const get_fields = async ()=>{
+        const fields0 = await fields_get(rpc, model,fs,['type','relation'])
+        return Object.keys(fields0).reduce( (acc,cur)=>{
+            if(fs.indexOf(cur)>=0 ){
+                acc[cur] = fields0[cur]
+            } 
+            return acc
+        },{})
+    }
+    
+    const  fields = await get_fields()
     
     class cls {
         static _name = model
         static _rpc = rpc
+        static _env = env
         static _fields = fields
         static _records = {}
         static _instances = {}
         
         constructor(ids,vals){
-            this._env = env
             if(typeof(ids) === 'object' ){
                 this._ids = ids
                 this._instances = ids.reduce((acc,cur)=>{
@@ -53,27 +58,43 @@ const modelCreator = async (options)=>{
             
         }
         
-        list(){
-            // only for multi
+        // only for multi
+        list(){ // only for multi
             return Object.values( this._instances )
         }
         
-        byid(id){
-            // only for multi
+        // only for multi
+        byid(id){ // only for multi
             return this._instances[id]
         }
+        
+        static async env(relation){
+            let ref_cls = await this._env[relation]
 
-        attr(attr,flash=0 ){
-            // only for single
+            if(!ref_cls){
+                ref_cls = await modelCreator({
+                    model:relation, 
+                    rpc: cls._rpc, 
+                    env:cls._env
+                })
+                this._env[relation] = ref_cls
+            }
+            
+            return ref_cls
+        
+        }
+        
+        // only for single
+        attr(attr,flash=0 ){ // only for single
             const raw = ( cls._records[this._id] || {} )[attr]
-            const {type,relation} = cls._fields[attr]
+            const {type,relation} = cls._fields[attr] || {}
+            
             if(['many2one','one2many', 'many2many'].indexOf(type)<0 ){
                 return raw
             }
             
-            const ref_cls = this._env[relation]
-            
-            if( type === 'many2one'){
+            return cls.env(relation).then(ref_cls=>{
+              if( type === 'many2one'){
                 if(flash){
                     return ref_cls.read(raw[0])
                 }
@@ -82,10 +103,15 @@ const modelCreator = async (options)=>{
                 const vals = {id,name,display_name:name}
                 const ref_ins = new ref_cls(raw[0],vals)
                 return ref_ins
-            }
-            else{
+              }
+              else{
+                //  TBD flash=1
                 return ref_cls.read(raw)
-            }
+              }
+                
+            })
+            
+            
         }
         
         static async call(method, args=[], kwargs={} ){
@@ -100,6 +126,8 @@ const modelCreator = async (options)=>{
                 const {result} = data
                 return result
             }
+            
+            // TBD error save in class
             return null 
         }
         
@@ -158,8 +186,13 @@ const modelCreator = async (options)=>{
         
         static async unlink(id){
             const data = await cls.call('unlink',[ id ])
-            //TBD
+            if(data){
+                //TBD
+                return data
+            }
+                
             return data
+                
         }
 
         async unlink( vals){

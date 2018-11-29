@@ -5,7 +5,9 @@ import RPC from '../src/rpc'
 
 describe('jsonrpc', () => {
   it('all ok', (done) => {
-    test_browse_multi(done)
+    
+  //  test_browse_multi(done)
+   test(done)
 
   });
 });
@@ -22,29 +24,47 @@ const get_rpc = async () => {
 
 const env = { }
 
-const get_model = async ({ model,rpc, fields} ) => {
+const get_model =  ({ model,rpc, fields} ) => {
     let cls = env[model]
     if(cls){
         return cls
     }
-    cls = await models({model, rpc , fields, env})
+    cls =  models({model, rpc , fields, env})
     env[model] = cls
     return cls
     
 }
 
 
+const test = async (done) => {
+    done()
+}
+
 const test_browse_multi = async (done) => {
     //const env = new Environment()
     const rpc = await get_rpc()
-    const fields = ['name','partner_id','company_id','category_id']
-    const Users = await get_model({model:'res.users', rpc , fields})
+    const fields = ['name','partner_id','company_id','category_id','werwer']
+    console.log('1131313')
+    get_model({model:'res.users', rpc , fields})
+    const fields3 = ['name']
+    get_model({model:'res.partner.category', rpc , fields:fields3 })
+    
+    
+    const Users0 = env['res.users']
+    const CTG0 = env['res.partner.category']
+
+    console.log(Users0)
+    console.log(CTG0)
+    
+    const Users = await Users0
+    const CTG = await CTG0
+    console.log(Users)
+    console.log(CTG)
+
 
     const fields2 = ['name','email']
-    const Comp = await get_model({model:'res.company', rpc , fields:fields2 })
+//    const Comp = await get_model({model:'res.company', rpc , fields:fields2 })
 
-    const fields3 = ['name']
-    const CTG = await get_model({model:'res.partner.category', rpc , fields:fields3 })
 
 //    console.log(Users)
 //    console.log(Comp)
@@ -68,7 +88,7 @@ const test_browse_multi = async (done) => {
     console.log( comp )
     console.log( comp.attr('name') )
     console.log( comp.attr('email') )
-    console.log( Comp )
+//    console.log( Comp )
     //console.log( Users._records )
     
     const ctgs = await usr6.attr('category_id') 
@@ -79,7 +99,8 @@ const test_browse_multi = async (done) => {
     
     console.log(ctg1.attr('name'))
     
-/*
+
+/*    
     
     const u0 = await Users.call('search',[[['id','>',30]]])
 //    console.log(Users._instances)
